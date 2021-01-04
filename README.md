@@ -1,7 +1,7 @@
 # pythonAAE
 learning python from AAE course at UWMadison 636 637 722
 
-![Siming Yan](https://img.shields.io/badge/npm%20package-v1-brightgreen.svg)
+![Siming Yan](https://img.shields.io/badge/A%20project%20by-Siming__Yan-ff69b4)
 
 ![at](https://img.shields.io/badge/build-succeeded-brightgreen.svg)
 
