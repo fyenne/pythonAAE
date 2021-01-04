@@ -1,15 +1,11 @@
 # pythonAAE
 learning python from AAE course at UWMadison 636 637 722
 
-Contributors Forks Stargazers Issues MIT License LinkedIn
+![Siming Yan](https://img.shields.io/badge/npm%20package-v1-brightgreen.svg)
 
+![at](https://img.shields.io/badge/build-succeeded-brightgreen.svg)
 
-Logo
+![UW-Madison](https://img.shields.io/badge/Tests-passing-brightgreen.svg)
 
-project_title
-project_description
-Explore the docs »
-
-View Demo · Report Bug · Request Feature
 
 
