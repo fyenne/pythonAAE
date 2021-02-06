@@ -474,10 +474,25 @@ scores = -1 * cross_val_score(my_pipeline, X, y,
                               scoring='neg_mean_absolute_error')
 
 print("MAE scores:\n", scores)
+print("Average MAE score (across experiments):")
+print(scores.mean())
 ```
 
 ```python
-print("Average MAE score (across experiments):")
-print(scores.mean())
+# easier way:
+```
+
+```python
+def get_score(n_estimators):
+    #"""Return the average MAE over 3 CV folds of random forest model.
+    my_pipeline = Pipeline(steps = [
+        ('preprocessor', SimpleImputer()),
+        ('model', RandomForestRegressor(n_estimators, random_state = 0))
+    ])
+    scores = -1 * cross_val_score(my_pipeline, X, y,
+                              cv=5,
+                              scoring='neg_mean_absolute_error')
+    return scores.mean()
+
 ```
 
