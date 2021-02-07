@@ -496,3 +496,12 @@ def get_score(n_estimators):
 
 ```
 
+# Kaggle XGB
+
+`remain to be done`
+
+
+
+
+
+1
