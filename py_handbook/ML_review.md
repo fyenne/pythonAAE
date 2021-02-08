@@ -1,14 +1,19 @@
 <center><span style="font-size:42px;color:#8B30BB;">Machine Learning Review:  </center></span>
 
-`Siming Yan`
+`Siming Yan` (@www.fyenneyenn.studio)
 
 `01,2021`
 
-`According to books: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
+`According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
 
 ---
 
 # Kaggle: **Decision tree**
+
+* both regression and classification
+* top-down, greedy approach that is known as recursive binary splitting. It is greedy because at each step of the tree-building process, the **best split is made at that particular step** 
+* a better strategy is to grow a very large tree T0, and then prune it back in order to obtain a subtree to avoid overfitting problem.
+* non robust and low accuracy.
 
 ```python
 from sklearn.ensemble import DecisionTreeRegressor
@@ -28,7 +33,7 @@ val_predictions = melbourne_model.predict(val_X)
 print(mean_absolute_error(val_y, val_predictions))
 ```
 
-Many machine learning models allow some randomness in model training. Specifying a number for `random_state` ensures you get the same results in each run. This is considered a good practice. You use any number, and model quality won't depend meaningfully on exactly what value you choose.
+Many machine learning models allow some randomness in model training. Specifying a number for `random_state` (`setseed()`)ensures you get the same results in each run.
 
 ```python
 from sklearn.metrics import mean_absolute_error
@@ -498,10 +503,62 @@ def get_score(n_estimators):
 
 # Kaggle XGB
 
-`remain to be done`
+ 
 
+**Gradient boosting** is a method that goes through cycles to iteratively add models into an ensemble.
 
+- First, we use the current ensemble to generate predictions for each observation in the dataset. To make a prediction, we add the predictions from all models in the ensemble.
+- These predictions are used to calculate a loss function (like [mean squared error](https://en.wikipedia.org/wiki/Mean_squared_error), for instance).
+- Then, we use the loss function to fit a new model that will be added to the ensemble. Specifically, we determine model parameters so that adding this new model to the ensemble will reduce the loss. (*Side note: The "gradient" in "gradient boosting" refers to the fact that we'll use [gradient descent](https://en.wikipedia.org/wiki/Gradient_descent) on the loss function to determine the parameters in this new model.*)
+- Finally, we add the new model to ensemble, and ...
+- ... repeat!
 
+```python
+from xgboost import XGBRegressor
 
+my_model = XGBRegressor()
+my_model.fit(X_train, y_train) # naive ensemble
+```
 
-1
+```python
+from sklearn.metrics import mean_absolute_error
+predictions = my_model.predict(X_valid)
+print("Mean Absolute Error: " + str(mean_absolute_error(predictions, y_valid)))
+```
+
+`n_estimators` specifies how many times to go through the modeling cycle described above. It is equal to the number of models that we include in the ensemble.
+
+```python
+my_model = XGBRegressor(n_estimators=500)
+my_model.fit(X_train, y_train)
+```
+
+> `early_stopping_rounds`
+
+`early_stopping_rounds` offers a way to automatically find the ideal value for `n_estimators`. Early stopping causes the model to stop iterating when the validation score stops improving, even if we aren't at the hard stop for `n_estimators`. It's smart to set a high value for `n_estimators` and then use `early_stopping_rounds` to find the optimal time to stop iterating. 
+
+> `learning_rate`
+
+Instead of getting predictions by simply adding up the predictions from each component model, we can multiply the predictions from each model by a small number (known as the **learning rate**) before adding them in.
+
+This means each tree we add to the ensemble helps us less. So, we can set a higher value for `n_estimators` without overfitting. If we use early stopping, the appropriate number of trees will be determined automatically.
+
+In general, a small learning rate and large number of estimators will yield more accurate XGBoost models, though it will also take the model longer to train since it does more iterations through the cycle. As default, XGBoost sets `learning_rate=0.1`.
+
+> `n_jobs`
+
+On larger datasets where runtime is a consideration, you can use parallelism to build your models faster. It's common to set the parameter `n_jobs` equal to the number of cores on your machine. On smaller datasets, this won't help.
+
+The resulting model won't be any better, so micro-optimizing for fitting time is typically nothing but a distraction. But, it's useful in large datasets where you would otherwise spend a long time waiting during the `fit` command.
+
+Here's the modified example:
+
+ ```python
+my_model = XGBRegressor(n_estimators=1000, learning_rate=0.05, n_jobs=4)
+my_model.fit(X_train, y_train, 
+             early_stopping_rounds=5, 
+              # stop after 5 straight rounds of deteriorating validation scores.
+             eval_set=[(X_valid, y_valid)], 
+             verbose=False)
+ ```
+
