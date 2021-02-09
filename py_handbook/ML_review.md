@@ -562,3 +562,29 @@ my_model.fit(X_train, y_train,
              verbose=False)
  ```
 
+
+
+
+
+
+
+
+
+
+
+<center><span style="font-size:42px;color:#8B30BB;">R Machine Learning Review:  </center></span>
+
+```html
+
+```
+
+
+
+# LDA model:
+
+![Screen Shot 2021-02-09 at 4.22.01 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/Screen Shot 2021-02-09 at 4.22.01 PM.png)
+
+` Why LDA?`
+
+![Screen Shot 2021-02-09 at 4.26.18 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/Screen Shot 2021-02-09 at 4.26.18 PM.png)
+
