@@ -267,7 +267,7 @@ print(score_dataset(imputed_X_train_plus, imputed_X_valid_plus, y_train, y_valid
 
 ~~Given that thre are so few missing values in the dataset, we'd expect imputation to perform better than dropping columns entirely.~~**However, we see that dropping columns performs slightly better!** While this can probably partially be attributed to **noise** in the dataset, ~~another potential explanation is that the imputation method is not a great match to this dataset.~~That is, maybe instead of filling in the mean value, it makes more sense to set every missing value to **a value of 0,** to fill in the most frequently encountered value, or to use some other method. For instance, consider the `GarageYrBlt` column (which indicates the year that the garage was built). It's likely that in some cases, a missing value could indicate a house that does not have a garage. Does it make more sense to fill in the median value along each column in this case? Or could we get better results by filling in the minimum value along each column? It's not quite clear what's best in this case, but perhaps we can rule out some options immediately - for instance, setting missing values in this column to 0 is likely to yield horrible results!
 
-## categorical variables.
+## Categorical variables.
 
 ```python
 s = (X_train.dtypes == 'object')
@@ -444,7 +444,7 @@ print('MAE:', score)
 
 
 
-# cross validation
+# Cross validation
 
 In **cross-validation**, we run our modeling process on different subsets of the data to get multiple measures of model quality.
 
@@ -562,21 +562,65 @@ my_model.fit(X_train, y_train,
              verbose=False)
  ```
 
+> Pretty good prediction accuracy.
+
+# data leakage
+
+**Data leakage** (or **leakage**) happens when your training data contains information about the target, but similar data will not be available when the model is used for prediction. This leads to high performance on the training set (and possibly even the validation data), but the model will perform poorly in production.
+
+```python
+# not clear yet what are these functions for:
+expenditures_cardholders = X.expenditure[y]
+expenditures_noncardholders = X.expenditure[~y]
+
+print('Fraction of those who did not receive a card and had no expenditures: %.2f' \
+      %((expenditures_noncardholders == 0).mean()))
+print('Fraction of those who received a card and had no expenditures: %.2f' \
+      %(( expenditures_cardholders == 0).mean()))
+```
 
 
 
+```python
+#Cross-val accuracy
+potential_leaks = ['expenditure', 'share', 'active', 'majorcards']
+X2 = X.drop(potential_leaks, axis=1)
 
+# Evaluate the model with leaky predictors removed
+cv_scores = cross_val_score(my_pipeline, X2, y, 
+                            cv=5,
+                            scoring='accuracy')
 
+print("Cross-val accuracy: %f" % cv_scores.mean())
+## 0.828650 
+```
 
+we can expect it to be right about 80% of the time when used on new applications, whereas the leaky model would likely do much worse than that (in spite of its higher apparent score in cross-validation).
 
+https://www.kaggle.com/fyenneyenn/exercise-data-leakage/edit
+
+---
+
+耐克问题：工厂本月毛皮使用量, 在预测鞋带生产上，是perfect  indicator 还是data leakage?
+
+```Nike has hired you as a data science consultant to help them save money on shoe materials. Your first assignment is to review a model one of their employees built to predict how many shoelaces they'll need each month. The features going into the machine learning model include:
+
+```
+
+- The current month (January, February, etc)
+- Advertising expenditures in the previous month
+- Various macroeconomic features (like the unemployment rate) as of the beginning of the current month
+- The amount of leather they ended up using in the current month
+
+```The results show the model is almost perfectly accurate if you include the feature about how much leather they used. But it is only moderately accurate if you leave that feature out. You realize this is because the amount of leather they use is a perfect indicator of how many shoes they produce, which in turn tells you how many shoelaces they need.
+
+```
+
+This is tricky, and it depends on details of how data is collected (which is common when thinking about leakage). Would you at the beginning of the month decide how much leather will be used that month? If so, this is ok. But if that is determined during the month, you would not have access to it when you make the prediction. If you have a guess at the beginning of the month, and it is subsequently changed during the month, the actual amount used during the month cannot be used as a feature (because it causes leakage).
 
 
 
 <center><span style="font-size:42px;color:#8B30BB;">R Machine Learning Review:  </center></span>
-
-```html
-
-```
 
 
 
