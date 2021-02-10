@@ -185,6 +185,296 @@ def score_dataset(X_train, X_valid, y_train, y_valid):
     return mean_absolute_error(y_valid, preds)
 ```
 
+## tuning the hyperparameters
+
+### grid search: SVM
+
+```python
+from sklearn import datasets
+from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
+from sklearn.svm import SVC
+import warnings
+warnings.filterwarnings("ignore")
+
+# Loading the Digits dataset
+digits = datasets.load_digits()
+
+# To apply an classifier on this data, we need to flatten the image, to
+# turn the data in a (samples, feature) matrix:
+n_samples = len(digits.images)
+X = digits.images.reshape((n_samples, -1))
+y = digits.target
+
+# Split the dataset in two equal parts
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=0)
+
+# Set the parameters by cross-validation
+tuned_parameters = [
+  {'kernel': ['rbf','sigmoid', 'linear'], 'gamma': [1e-3, 1e-4, 1e-2], 'C': [1, 10, 100, 1000]}]
+  
+# Objective metrics
+scores = ['precision']
+
+
+clf = GridSearchCV(SVC(), tuned_parameters, cv=5, scoring='%s_macro' % scores[0])
+clf.fit(X_train, y_train)
+
+print("Best Hyperparameters found are:")
+print(clf.best_params_)
+
+print("Grid scores are:")
+
+means = clf.cv_results_['mean_test_score']
+for mean,params in zip(means, clf.cv_results_['params']):
+  print("%0.3f for %r" % (mean, params))
+
+```
+
+### Random Search: RF
+
+```python
+from time import time
+from scipy.stats import randint as sp_randint
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.datasets import load_digits
+from sklearn.ensemble import RandomForestClassifier
+
+# Download the MNIST Dataset - using load_digits funct
+digits = load_digits()
+X, y = digits.data, digits.target
+
+# build a random forest classifier
+rfc = RandomForestClassifier(n_estimators=20)
+
+# specify parameters and distributions to sample from
+hp = {"max_depth": [4, 3, 2],
+              "min_samples_split": sp_randint(2, 11),
+              "criterion": ["gini", "entropy"],
+              "bootstrap": [True, False]
+              }
+
+# run randomized search
+n_iter_search = 10
+random_search = RandomizedSearchCV(rfc, param_distributions=hp,
+                                   n_iter=n_iter_search, cv=5, iid=False)
+
+start = time()
+random_search.fit(X, y)
+print("RandomizedSearchCV took %.2f seconds for %d candidates"
+      " parameter settings." % ((time() - start), n_iter_search))
+means = random_search.cv_results_['mean_test_score']
+stds = random_search.cv_results_['std_test_score']
+for mean, std, params in zip(means, stds, random_search.cv_results_['params']):
+  print("%0.3f (+/-%0.03f) for %r" % (mean, std * 2, params))
+
+
+```
+
+
+
+
+
+### Bayesian Optimization: Tensorflow & nn
+
+```python
+import warnings
+warnings.filterwarnings("ignore")
+
+#Importing liberaries
+from tensorflow.python.keras import backend as K
+from tensorflow.python.keras.models import Sequential
+from tensorflow.python.keras.layers import InputLayer
+from tensorflow.python.keras.layers import Reshape, MaxPooling2D
+from tensorflow.python.keras.layers import Conv2D, Dense, Flatten
+from tensorflow.python.keras.optimizers import Adam
+
+
+from skopt import gp_minimize
+from skopt.space import Real, Categorical, Integer
+from skopt.utils import use_named_args
+import numpy as np
+
+# Define the Hyperparameters ranges:
+dim_learning_rate = Real(low=1e-6, high=1e-2, prior='log-uniform', name='learning_rate')
+dim_num_dense_layers = Integer(low=1, high=5, name='num_dense_layers')
+dim_num_dense_nodes = Integer(low=5, high=512, name='num_dense_nodes')
+dim_activation = Categorical(categories=['relu', 'sigmoid'],name='activation')
+
+
+HPs = [dim_learning_rate,dim_num_dense_layers,dim_num_dense_nodes,dim_activation]
+
+
+#It is a good idea to define a default range.
+default_parameters = [1e-5, 1, 16, 'relu']
+
+#Import the MNIST Dataset
+from tensorflow.examples.tutorials.mnist import input_data
+data = input_data.read_data_sets('data/MNIST/', one_hot=True)
+data.test.cls = np.argmax(data.test.labels, axis=1)
+validation_data = (data.validation.images, data.validation.labels)
+
+
+#Define the data dimension
+# We know that MNIST images are 28 pixels in each dimension.
+img_size = 28
+
+# Images are stored in one-dimensional arrays of this length.
+img_size_flat = img_size * img_size
+
+# Tuple with height and width of images used to reshape arrays.
+# This is used for plotting the images.
+img_shape = (img_size, img_size)
+
+# Tuple with height, width and depth used to reshape arrays.
+# This is used for reshaping in Keras.
+img_shape_full = (img_size, img_size, 1)
+
+# Number of colour channels for the images: 1 channel for gray-scale.
+num_channels = 1
+
+# Number of classes, one class for each of 10 digits.
+num_classes = 10
+
+def create_model(learning_rate, num_dense_layers,
+                 num_dense_nodes, activation):
+    """
+    Hyper-parameters:
+    learning_rate:     Learning-rate for the optimizer.
+    num_dense_layers:  Number of dense layers.
+    num_dense_nodes:   Number of nodes in each dense layer.
+    activation:        Activation function for all layers.
+    """
+    
+    # Start construction of a Keras Sequential model.
+    model = Sequential()
+
+    # Add an input layer which is similar to a feed_dict in TensorFlow.
+    # Note that the input-shape must be a tuple containing the image-size.
+    model.add(InputLayer(input_shape=(img_size_flat,)))
+
+    # The input from MNIST is a flattened array with 784 elements,
+    # but the convolutional layers expect images with shape (28, 28, 1)
+    model.add(Reshape(img_shape_full))
+
+    # First convolutional layer.
+    # There are many hyper-parameters in this layer, but we only
+    # want to optimize the activation-function in this example.
+    model.add(Conv2D(kernel_size=5, strides=1, filters=16, padding='same',
+                     activation=activation, name='layer_conv1'))
+    model.add(MaxPooling2D(pool_size=2, strides=2))
+
+    # Second convolutional layer.
+    # Again, we only want to optimize the activation-function here.
+    model.add(Conv2D(kernel_size=5, strides=1, filters=36, padding='same',
+                     activation=activation, name='layer_conv2'))
+    model.add(MaxPooling2D(pool_size=2, strides=2))
+
+    # Flatten the 4-rank output of the convolutional layers
+    # to 2-rank that can be input to a fully-connected / dense layer.
+    model.add(Flatten())
+
+    # Add fully-connected / dense layers.
+    # The number of layers is a hyper-parameter we want to optimize.
+    for i in range(num_dense_layers):
+        # Name of the layer. This is not really necessary
+        # because Keras should give them unique names.
+        name = 'layer_dense_{0}'.format(i+1)
+
+        # Add the dense / fully-connected layer to the model.
+        # This has two hyper-parameters we want to optimize:
+        # The number of nodes and the activation function.
+        model.add(Dense(num_dense_nodes,
+                        activation=activation,
+                        name=name))
+
+    # Last fully-connected / dense layer with softmax-activation
+    # for use in classification.
+    model.add(Dense(num_classes, activation='softmax'))
+    
+    # Use the Adam method for training the network.
+    # We want to find the best learning-rate for the Adam method.
+    optimizer = Adam(lr=learning_rate)
+    
+    # In Keras we need to compile the model so it can be trained.
+    model.compile(optimizer=optimizer,
+                  loss='categorical_crossentropy',
+                  metrics=['accuracy'])
+    
+    return model
+
+@use_named_args(dimensions=HPs)
+def fitness(learning_rate, num_dense_layers,
+            num_dense_nodes, activation):
+    """
+    Hyper-parameters:
+    learning_rate:     Learning-rate for the optimizer.
+    num_dense_layers:  Number of dense layers.
+    num_dense_nodes:   Number of nodes in each dense layer.
+    activation:        Activation function for all layers.
+    """
+
+    # Print the hyper-parameters.
+    print('learning rate: {0:.1e}'.format(learning_rate))
+    print('num_dense_layers:', num_dense_layers)
+    print('num_dense_nodes:', num_dense_nodes)
+    print('activation:', activation)
+    print()
+    
+    # Create the neural network with these hyper-parameters.
+    model = create_model(learning_rate=learning_rate,
+                         num_dense_layers=num_dense_layers,
+                         num_dense_nodes=num_dense_nodes,
+                         activation=activation)
+
+    
+    # Create a callback-function for Keras which will be
+    # run after each epoch has ended during training.
+    # This saves the log-files for TensorBoard.
+    # Note that there are complications when histogram_freq=1.
+    # It might give strange errors and it also does not properly
+    # support Keras data-generators for the validation-set.
+   
+    # Use Keras to train the model.
+    history = model.fit(x=data.train.images,
+                        y=data.train.labels,
+                        epochs=1,
+                        batch_size=128,
+                        validation_data=validation_data)
+
+    # Get the classification accuracy on the validation-set
+    # after the last training-epoch.
+    accuracy = history.history['val_acc'][-1]
+
+    # Print the classification accuracy.
+    print()
+    print("Accuracy: {0:.2%}".format(accuracy))
+    print()
+
+    # Delete the Keras model with these hyper-parameters from memory.
+    del model
+    
+    # Clear the Keras session, otherwise it will keep adding new
+    # models to the same TensorFlow graph each time we create
+    # a model with a different set of hyper-parameters.
+    K.clear_session()
+    
+    # NOTE: Scikit-optimize does minimization so it tries to
+    # find a set of hyper-parameters with the LOWEST fitness-value.
+    # Because we are interested in the HIGHEST classification
+    # accuracy, we need to negate this number so it can be minimized.
+    return -accuracy
+
+search_result = gp_minimize(func=fitness,
+                            dimensions=HPs,
+                            acq_func='EI', # Expected Improvement.
+                            n_calls=40,
+                            x0=default_parameters)
+
+                      
+```
+
 
 
 # To deal with missing values.
@@ -393,6 +683,19 @@ preprocessing functions -> models set up -> pipline combination
 ---
 
 ### prepare preprocessing functions
+
+```python
+
+categorical_cols = [cname for cname in X_train_full.columns if
+                    X_train_full[cname].nunique() < 10 and 
+                    X_train_full[cname].dtype == "object"]
+
+# Select numerical columns
+numerical_cols = [cname for cname in X_train_full.columns if 
+                X_train_full[cname].dtype in ['int64', 'float64']]
+
+
+```
 
 ```python
 from sklearn.compose import ColumnTransformer
@@ -631,4 +934,8 @@ This is tricky, and it depends on details of how data is collected (which is com
 ` Why LDA?`
 
 ![Screen Shot 2021-02-09 at 4.26.18 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/Screen Shot 2021-02-09 at 4.26.18 PM.png)
+
+
+
+
 
