@@ -605,8 +605,6 @@ In the code cell above, for each column, we randomly assign each unique value to
 
 ### one-hot encoding (`R: fastDummies`)
 
-
-
 ```python
 from sklearn.preprocessing import OneHotEncoder
 
@@ -653,12 +651,6 @@ sorted(d.items(), key=lambda x: x[1])
 ```
 
 ---
-
-
-
-
-
-
 
 # piplines
 
