@@ -915,9 +915,245 @@ This is tricky, and it depends on details of how data is collected (which is com
 
 
 
-<center><span style="font-size:42px;color:#8B30BB;">R Machine Learning Review:  </center></span>
+<center><span style="font-size:42px;color:#8B30BB;">TensorFlow! Machine Learning Review:</center></span>
 
 
+
+# setup tensorflow on Mac M1 chip
+
+create virtual environment: 
+
+`download miniconda.`
+
+`conda create name --=-- python = 3.8.6 (maybe, I forgot.)`
+
+Basically it follows this aritcle.
+
+`https://zhuanlan.zhihu.com/p/343769603`
+
+yeah I dont remember how it worked.
+
+```python
+tf.__version__
+# '2.4.0-rc0'
+# you got this if ur right!
+```
+
+
+
+# basic shit of tensorflow
+
+```html
+https://tf.wiki/zh_hans/basic/basic.html
+kaggle
+https://www.tensorflow.org/api_docs/python/tf/data/Dataset
+https://www.tutorialspoint.com/tensorflow/tensorflow_basics.htm
+```
+
+```python
+import tensorflow as tf
+import numpy as np
+
+matrix1 = np.array([(2,2,2),(2,2,2),(2,2,2)],dtype = 'int32')
+matrix2 = np.array([(1,1,1),(1,1,1),(1,1,1)],dtype = 'int32')
+
+print (matrix1)
+print (matrix2)
+# tensorflow matrix calculations !
+matrix1 = tf.constant(matrix1)
+matrix2 = tf.constant(matrix2)
+# ---
+matrix_product = tf.matmul(matrix1, matrix2)
+matrix_sum = tf.add(matrix1,matrix2)
+matrix_3 = np.array([(2,7,2),(1,4,2),(9,0,2)],dtype = 'float32')
+#--------------------------------------------
+matrix_det = tf.matrix_determinant(matrix_3)
+with tf.Session() as sess:
+   result1 = sess.run(matrix_product)
+   result2 = sess.run(matrix_sum)
+   result3 = sess.run(matrix_det)
+print (result1)
+print (result2)
+print (result3)
+```
+
+```python
+# 生成随机数 [1，3]
+tf.random.uniform(shape = (1,3))
+# 0
+tf.zeros(shape=(2))
+# matrix
+A = tf.constant([[1., 2.], [3., 4.]])
+
+```
+
+
+
+## 自动求导
+
+```python
+import tensorflow as tf
+
+x = tf.Variable(initial_value=3.)
+# x ==> variable with an initial value
+with tf.GradientTape() as tape:     # 在 tf.GradientTape() 的上下文内，所有计算步骤都会被记录以用于求导
+    y = tf.square(x) + x
+y_grad = tape.gradient(y, x)        # 计算y关于x的导数
+print(y, y_grad)
+```
+
+## linear regression
+
+```python
+X_raw = np.array([2013, 2014, 2015, 2016, 2017], dtype=np.float32)
+y_raw = np.array([12000, 14000, 15000, 16500, 17500], dtype=np.float32)
+# 归一化
+X = (X_raw - X_raw.min()) / (X_raw.max() - X_raw.min())
+y = (y_raw - y_raw.min()) / (y_raw.max() - y_raw.min())
+#--------------------------------------------
+# 求解
+X = tf.constant(X)
+y = tf.constant(y)
+a = tf.Variable(initial_value=0.)
+b = tf.Variable(initial_value=0.)
+variables = [a, b]
+num_epoch = 10000
+optimizer = tf.keras.optimizers.SGD(learning_rate=5e-4)
+for e in range(num_epoch):
+    # 使用tf.GradientTape()记录损失函数的梯度信息
+    with tf.GradientTape() as tape:
+        y_pred = a * X + b
+        loss = tf.reduce_sum(tf.square(y_pred - y))
+    # TensorFlow自动计算损失函数关于自变量（模型参数）的梯度
+    grads = tape.gradient(loss, variables)
+    # TensorFlow自动根据梯度更新参数
+    optimizer.apply_gradients(grads_and_vars=zip(grads, variables))
+
+a, b # solved # zip() 函数是 Python 的内置函数。用自然语言描述这个函数的功能很绕口，但如果举个例子就很容易理解了：如果 a = [1, 3, 5]， b = [2, 4, 6]，那么 zip(a, b) = [(1, 2), (3, 4), ..., (5, 6)]
+
+```
+
+## TensorFlow 模型建立与训练
+
++ 模型的构建： tf.keras.Model 和 tf.keras.layers
+
+* 模型的损失函数： tf.keras.losses
+
+* 模型的优化器： tf.keras.optimizer
+
+* 模型的评估： tf.keras.metrics
+
+```python
+X = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])
+y = tf.constant([[10.0], [20.0]])
+class Linear(tf.keras.Model):
+    def __init__(self):
+        super().__init__()
+        self.dense = tf.keras.layers.Dense(
+            units=1,
+            activation=None,
+            kernel_initializer=tf.zeros_initializer(),
+            bias_initializer=tf.zeros_initializer()
+        )
+    def call(self, input):
+        output = self.dense(input)
+        return output
+# 以下代码结构与前节类似
+model = Linear()
+optimizer = tf.keras.optimizers.SGD(learning_rate=0.01)
+for i in range(100):
+    with tf.GradientTape() as tape:
+        y_pred = model(X)      
+        # 调用模型 y_pred = model(X) 而不是显式写出 y_pred = a * X + b
+        loss = tf.reduce_mean(tf.square(y_pred - y))
+    grads = tape.gradient(loss, model.variables)    
+    # 使用 model.variables 这一属性直接获得模型中的所有变量
+    optimizer.apply_gradients(grads_and_vars=zip(grads, model.variables))
+print(model.variables)
+```
+
+# Stochastic Gradient Descent
+
+We've described the problem we want the network to solve, but now we need to say how to solve it. This is the job of the optimizer. The optimizer is an algorithm that adjusts the weights to minimize the loss.
+
+Virtually all of the optimization algorithms used in deep learning belong to a family called stochastic gradient descent. They are iterative algorithms that train a network in steps. One step of training goes like this:
+
+Sample some training data and run it through the network to make predictions.
+
+* Measure the loss between the predictions and the true values.
+
+* Finally, adjust the weights in a direction that makes the loss smaller.
+
+* Then just do this over and over until the loss is as small as you like (or until it won't decrease any further.)
+
+Each iteration's sample of training data is called a **minibatch** (or often just "batch"), while a complete round of the training data is called an epoch. The number of **epochs** you train for is how many times the network will see each training example.
+
+The animation shows the linear model from Lesson 1 being trained with SGD. The pale red dots depict the entire training set, while the solid red dots are the minibatches. Every time SGD sees a new minibatch, it will shift the weights (w the slope and b the y-intercept) toward their correct values on that batch. Batch after batch, the line eventually converges to its best fit. You can see that the loss gets smaller as the weights get closer to their true values.
+
+Notice that the line only makes a small shift in the direction of each batch (instead of moving all the way). The size of these shifts is determined by the learning rate. A smaller learning rate means the network needs to see more minibatches before its weights converge to their best values.
+
+The learning rate and the size of the minibatches are the two parameters that have the largest effect on how the SGD training proceeds. Their interaction is often subtle and the right choice for these parameters isn't always obvious. (We'll explore these effects in the exercise.)
+
+Fortunately, for most work it won't be necessary to do an extensive hyperparameter search to get satisfactory results. Adam is an SGD algorithm that has an adaptive learning rate that makes it suitable for most problems without any parameter tuning (it is "self tuning", in a sense). Adam is a great general-purpose optimizer.
+
+
+
+```python
+from tensorflow import keras
+from tensorflow.keras import layers
+
+input_shape = [X_train.shape[2]]
+
+model = keras.Sequential([
+    layers.Dense(512, activation='relu', input_shape=input_shape),
+    layers.Dense(512, activation='relu'),
+    layers.Dense(512, activation='relu'),
+    layers.Dense(1),
+])
+
+model.compile(
+    optimizer='adam',
+    loss='mae',
+)
+
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_valid, y_valid),
+    batch_size=256,
+    epochs=10,
+)
+
+import pandas as pd
+
+# convert the training history to a dataframe
+history_df = pd.DataFrame(history.history)
+# use Pandas native plot method
+history_df['loss'].plot();
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#--------------------------------------------
+
+---
 
 # LDA model:
 
