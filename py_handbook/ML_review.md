@@ -1135,6 +1135,8 @@ history_df['loss'].plot();
 
 
 
+Lazy update. sorry
+
 
 
 
