@@ -1184,21 +1184,42 @@ history_df.loc[:, ['loss', 'val_loss']].plot();
 print("Minimum validation loss: {}".format(history_df['val_loss'].min()))
 ```
 
+# Dropout and Batch Normalization
 
+In this lesson, we'll learn about a two kinds of special layers, not containing any neurons themselves, but that add some functionality that can sometimes benefit a model in various ways. Both are commonly used in modern architectures.
 
+## Dropout Layer
 
+In the last lesson we talked about how overfitting is caused by the network learning spurious patterns in the training data. To recognize these spurious patterns a network will often rely on very a specific combinations of weight, a kind of "conspiracy" of weights. Being so specific, they tend to be fragile: remove one and the conspiracy falls apart. we randomly *drop out* some fraction of a layer's input units every step of training, making it much harder for the network to learn those spurious patterns in the training data. Instead, it has to search for broad, general patterns, whose weight patterns tend to be more robust.
 
+```python
+keras.Sequential([
+    # ...
+    layer.Dropout(rate=0.3), # apply 30% dropout to the next layer
+    layer.Dense(16),
+    # ...
+])
+```
 
+## Batch Normalization
 
++ which can help correct training that is slow or unstable. perhaps with something like scikit-learn's [StandardScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.StandardScaler.html) or [MinMaxScaler](https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.MinMaxScaler.html).
 
-
-
-
-
-
-
-
-
+```python
+model = keras.Sequential([
+    layers.Dense(1024, activation='relu', input_shape=[11]),
+    layers.Dropout(0.3),
+    layers.BatchNormalization(),
+  #--------------------------------------------
+    layers.Dense(1024, activation='relu'),
+    layers.Dropout(0.3),
+    layers.BatchNormalization(),
+    layers.Dense(1024, activation='relu'),
+    layers.Dropout(0.3),
+    layers.BatchNormalization(),
+    layers.Dense(1),
+])
+```
 
 
 
