@@ -52,13 +52,9 @@ This is a phenomenon called **overfitting**, where a model matches the training 
 
 ## Traning model
 
+<img src="/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/overfitting.png" alt="overfitting" style="zoom:67%;" />
 
-
- ![Screen Shot 2021-02-04 at 5.30.55 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/Screen Shot 2021-02-04 at 5.30.55 PM.png)
-
-
-
-We want the lowest validation set MAE. Following is the MAE 调参方程
+ We want the lowest validation set MAE. Following is the MAE 调参方程
 
 ```python
 def get_mae(max_leaf_nodes, train_X, val_X, train_y, val_y):
@@ -477,13 +473,15 @@ search_result = gp_minimize(func=fitness,
 
 
 
-# To deal with missing values.
+# To clean with *<span style="font-size:32px;color:#8B30BB;">values</span>*.
 
 ## check NAs.
 
 ```python
 missing_val_count_by_column = (X_train.isnull().sum())
 print(missing_val_count_by_column[missing_val_count_by_column > 0])
+
+<center><span style="font-size:42px;color:#8B30BB;">Machine Learning Review:  </center></span>
 ```
 
 ### drop NAs
@@ -510,7 +508,7 @@ print(score_dataset(reduced_X_train, reduced_X_valid, y_train, y_valid))
 
 
 
-### Approach 2 (Imputation)
+### Imputation
 
 ```python
 from sklearn.impute import SimpleImputer
@@ -531,7 +529,7 @@ print(score_dataset(imputed_X_train, imputed_X_valid, y_train, y_valid))
 
 
 
-### Approach 3 (An Extension to Imputation)
+### An Extension to Imputation
 
 ```python
 X_train_plus = X_train.copy()
@@ -649,6 +647,21 @@ d = dict(zip(object_cols, object_nunique))
 sorted(d.items(), key=lambda x: x[1])
 
 ```
+
+
+
+### standard scaling:
+
+```python
+preprocessor = make_column_transformer(
+    (StandardScaler(),
+     make_column_selector(dtype_include = np.number)),
+    (OneHotEncoder(sparse=False),
+     make_column_selector(dtype_include = object)),
+)
+```
+
+
 
 ---
 
@@ -919,7 +932,7 @@ This is tricky, and it depends on details of how data is collected (which is com
 
 
 
-# setup tensorflow on Mac M1 chip
+# Setup tensorflow on Mac M1 chip
 
 create virtual environment: 
 
@@ -1103,7 +1116,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 
 input_shape = [X_train.shape[2]]
-
+#--------------------------------------------
+# build up model.
 model = keras.Sequential([
     layers.Dense(512, activation='relu', input_shape=input_shape),
     layers.Dense(512, activation='relu'),
@@ -1115,14 +1129,16 @@ model.compile(
     optimizer='adam',
     loss='mae',
 )
-
+#--------------------------------------------
+# run model
 history = model.fit(
     X_train, y_train,
     validation_data=(X_valid, y_valid),
     batch_size=256,
     epochs=10,
 )
-
+#--------------------------------------------
+# plot loss function descending
 import pandas as pd
 
 # convert the training history to a dataframe
@@ -1130,12 +1146,45 @@ history_df = pd.DataFrame(history.history)
 # use Pandas native plot method
 history_df['loss'].plot();
 
+```
 
+# Add `early stopping` to avoid `overfitting`:
+
+
+
+overfitting:
+
+<img src="/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/overfitting.png" alt="overfitting" style="zoom:67%;" />
+
+<img src="/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/eUF6mfo.png" alt="eUF6mfo" style="zoom:80%;" />
+
+```python
+from tensorflow.keras.callbacks import EarlyStopping
+
+early_stopping = EarlyStopping(
+    min_delta=0.001, # minimium amount of change to count as an improvement
+    patience=20, # how many epochs to wait before stopping
+    restore_best_weights=True,
+)
+
+... # define model
+... # model compile 
+
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_valid, y_valid),
+    batch_size=256,
+    epochs=500,
+    callbacks=[early_stopping], # put your callbacks in a list
+    verbose=0,  # turn off training log
+)
+
+history_df = pd.DataFrame(history.history)
+history_df.loc[:, ['loss', 'val_loss']].plot();
+print("Minimum validation loss: {}".format(history_df['val_loss'].min()))
 ```
 
 
-
-Lazy update. sorry
 
 
 
