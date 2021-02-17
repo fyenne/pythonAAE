@@ -1112,8 +1112,33 @@ Fortunately, for most work it won't be necessary to do an extensive hyperparamet
 
 
 ```python
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import make_column_transformer
+from sklearn.model_selection import GroupShuffleSplit
+
 from tensorflow import keras
 from tensorflow.keras import layers
+from tensorflow.keras import callbacks
+
+features_num  # numerical variabels. 
+features_cat # categorical variables
+preprocessor = make_column_transformer(
+    (StandardScaler(), features_num),
+    (OneHotEncoder(), features_cat),
+)
+
+def group_split(X, y, group, train_size=0.75):
+    splitter = GroupShuffleSplit(train_size=train_size)
+    train, test = next(splitter.split(X, y, groups=group))
+    return (X.iloc[train], X.iloc[test], y.iloc[train], y.iloc[test])
+
+X_train, X_valid, y_train, y_valid = group_split(X, y, artists)
+#--------------------------------------------
+X_train = preprocessor.fit_transform(X_train)
+X_valid = preprocessor.transform(X_valid)
+y_train = y_train / 100
+y_valid = y_valid / 100
 
 input_shape = [X_train.shape[2]]
 #--------------------------------------------
@@ -1136,11 +1161,10 @@ history = model.fit(
     validation_data=(X_valid, y_valid),
     batch_size=256,
     epochs=10,
+  	verbose = 0, # ?
 )
 #--------------------------------------------
 # plot loss function descending
-import pandas as pd
-
 # convert the training history to a dataframe
 history_df = pd.DataFrame(history.history)
 # use Pandas native plot method
