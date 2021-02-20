@@ -1314,9 +1314,23 @@ lazy update
 
 
 
+# quick thoughts:
 
 
 
+`Storing the non-rare labels (labels > 5%) in a csv file would help in test set preparation.`
+
+
+
+```python
+non_rare = pd.DataFrame()
+for i in categorical_features:
+    var_dist = data[i].value_counts().copy()
+    var_dist = (var_dist / var_dist.sum()).copy()
+    non_rare = pd.concat([non_rare,pd.DataFrame({i:var_dist[var_dist>0.05].index})],axis=1).copy()
+
+non_rare.to_csv('./non_rare_categories.csv',index=False)
+```
 
 
 
