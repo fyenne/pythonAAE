@@ -1384,6 +1384,54 @@ match_id, start, end = matches[0]
 print(nlp.vocab.strings[match_id], text_doc[start:end])
 ```
 
+## 1st project
+
+```python
+# data = pd.read_json('../input/nlp-course/restaurant.json')
+menu = ["Cheese Steak", "Cheesesteak", "Steak and Cheese", "Italian Combo", "Tiramisu", "Cannoli", ..... ]
+#--------------------------------------------
+# empty list, store ratings later.
+from collections import defaultdict
+# item_ratings is a dictionary of lists. If a key doesn't exist in item_ratings,
+# the key is added with an empty list as the value.
+item_ratings = defaultdict(list)
+# set a matcher up.
+matcher = PhraseMatcher(nlp.vocab, attr='LOWER')
+#--------------------------------------------
+for idx, review in data.iterrows(): # slice the dataframe
+  # read the text in to nlp ==>
+    doc = nlp(review.text)
+    # Using the matcher from the previous exercise
+    matches = matcher(doc)
+    # Create a set of the items found in the review text
+    found_items = set([doc[match[1]:match[2]].lower_ for match in matches])
+    # Update item_ratings with rating for each item in found_items
+    # Transform the item strings to lowercase to make it case insensitive
+    for item in found_items:
+        item_ratings[item].append(review.stars)
+#--------------------------------------------
+mean_ratings = {item: sum(ratings)/len(ratings) for item, ratings in item_ratings.items()}
+
+# Find the worst item, and write it as a string in worst_item. This can be multiple lines of code if you want.
+worst_item = sorted(mean_ratings, key=mean_ratings.get)[0]
+#--------------------------------------------
+
+counts = {item: len(ratings) for item, ratings in item_ratings.items()}
+item_counts = sorted(counts, key=counts.get, reverse=True)
+for item in item_counts:
+    print(f"{item:>25}{counts[item]:>5}")
+#--------------------------------------------    
+sorted_ratings = sorted(mean_ratings, key=mean_ratings.get)
+
+print("Worst rated menu items:")
+for item in sorted_ratings[:10]:
+    print(f"{item:20} Ave rating: {mean_ratings[item]:.2f} \tcount: {counts[item]}")
+    
+print("\n\nBest rated menu items:")
+for item in sorted_ratings[-10:]:
+    print(f"{item:20} Ave rating: {mean_ratings[item]:.2f} \tcount: {counts[item]}")
+```
+
 
 
 
