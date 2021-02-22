@@ -648,8 +648,6 @@ sorted(d.items(), key=lambda x: x[1])
 
 ```
 
-
-
 ### standard scaling:
 
 ```python
@@ -659,6 +657,20 @@ preprocessor = make_column_transformer(
     (OneHotEncoder(sparse=False),
      make_column_selector(dtype_include = object)),
 )
+```
+
+## further Data cleaning: erase non-frequent data:
+
+`Storing the non-rare labels (labels > 5%) in a csv file would help in test set preparation.`
+
+```python
+non_rare = pd.DataFrame()
+for i in categorical_features:
+    var_dist = data[i].value_counts().copy()
+    var_dist = (var_dist / var_dist.sum()).copy()
+    non_rare = pd.concat([non_rare,pd.DataFrame({i:var_dist[var_dist>0.05].index})],axis=1).copy()
+
+non_rare.to_csv('./non_rare_categories.csv',index=False)
 ```
 
 
@@ -1306,33 +1318,21 @@ print(("Best Validation Loss: {:0.4f}" +\
 
 
 
+# #-------------------------
 
+=
 
-lazy update
+---
 
-
-
-
-
-# quick thoughts:
-
-
-
-`Storing the non-rare labels (labels > 5%) in a csv file would help in test set preparation.`
+# Natural Language Processing:
 
 
 
 ```python
-non_rare = pd.DataFrame()
-for i in categorical_features:
-    var_dist = data[i].value_counts().copy()
-    var_dist = (var_dist / var_dist.sum()).copy()
-    non_rare = pd.concat([non_rare,pd.DataFrame({i:var_dist[var_dist>0.05].index})],axis=1).copy()
-
-non_rare.to_csv('./non_rare_categories.csv',index=False)
+import spacy
+nlp = spacy.load('en')
+doc = nlp("Tea is healthy and calming, don't you think?")
 ```
-
-
 
 #--------------------------------------------
 
