@@ -1326,12 +1326,28 @@ print(("Best Validation Loss: {:0.4f}" +\
 
 # Natural Language Processing:
 
+```python
+python -m venv tf24
+source .env/bin/activate
+pip install -U pip setuptools wheel
+pip install spacy
+#--------------------------------------------
+python
+import sys
+sys.path
+sys.path.append('/Users/fyenne/.env/lib/python3.7/site-packages')
+```
+
 
 
 ```python
 import spacy
 nlp = spacy.load('en')
 doc = nlp("Tea is healthy and calming, don't you think?")
+for token in doc:
+    print(token)
+    #--------------------------------------------
+# out put all element.
 ```
 
 #--------------------------------------------
