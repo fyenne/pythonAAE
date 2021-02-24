@@ -4,7 +4,7 @@
 
 `01,2021`
 
-`According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
+According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
 
 ---
 
@@ -1419,7 +1419,7 @@ worst_item = sorted(mean_ratings, key=mean_ratings.get)[0]
 counts = {item: len(ratings) for item, ratings in item_ratings.items()}
 item_counts = sorted(counts, key=counts.get, reverse=True)
 for item in item_counts:
-    print(f"{item:>25}{counts[item]:>5}")
+    print(f"{item:>25}{counts[item]:>5}") # :>25 前缩进25.。。。 :20 后缩进20
 #--------------------------------------------    
 sorted_ratings = sorted(mean_ratings, key=mean_ratings.get)
 
@@ -1442,11 +1442,7 @@ for item in sorted_ratings[-10:]:
 
 
 
-#--------------------------------------------
-
----
-
-# LDA model:
+#  LDA model:
 
 ![Screen Shot 2021-02-09 at 4.22.01 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/Screen Shot 2021-02-09 at 4.22.01 PM.png)
 
