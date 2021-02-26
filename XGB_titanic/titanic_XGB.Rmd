@@ -104,14 +104,14 @@ parallelStartSocket(cpus = detectCores())
 ```{r}
 #set parameter space
 params <- makeParamSet(makeDiscreteParam("booster", values = c("gbtree","gblinear")),
-                       makeIntegerParam("max_depth", lower = 4L,upper = 11L),
+                       makeIntegerParam("max_depth", lower = 1L,upper = 11L),
                        makeNumericParam("min_child_weight", lower = 1L,upper = 10L),
                        makeNumericParam("subsample", lower = 0.5,upper = .95),
                        makeNumericParam("colsample_bytree", lower = 0.5,upper = 1))
 
 #set resampling strategy
 rdesc <- makeResampleDesc("CV", iters=10L, stratify = T)
-ctrl  <- makeTuneControlRandom(maxit = 100L)
+ctrl  <- makeTuneControlRandom(maxit = 25L)
 ```
 
 #--------------------------------------------
@@ -122,7 +122,7 @@ ctrl  <- makeTuneControlRandom(maxit = 100L)
 mytune <- tuneParams(learner = lrn, 
                      task = traintask, 
                      resampling = rdesc, 
-                     measures = mmce, 
+                     measures = acc, 
                      par.set = params, 
                      control = ctrl, 
                      show.info = T)
