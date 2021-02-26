@@ -1,0 +1,153 @@
+---
+title: "titanic"
+author: "Siming Yan"
+date: "2/26/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+<!-- ## R Markdown -->
+ 
+
+```{r cars}
+library(caret)
+library(tidyverse)
+library(xgboost)
+library("Matrix")
+```
+
+
+```{r}
+train = read.csv("./train.csv")
+test  = read.csv("./test.csv")
+train_y = read.csv("./target.csv")
+```
+
+```{r}
+dummie = names(train)[!names(train) %in% c("name_len", "Parch", "FamilySize", "Age",
+                                           "Age.Class")]
+dummi2 = names(test )[!names(test ) %in% c("name_len", "Parch", "FamilySize", "Age",
+                                           "Age.Class")]
+
+df_train_d = fastDummies::dummy_cols(train, 
+                                     select_columns = dummie)
+
+df_test_d  = fastDummies::dummy_cols(test, 
+                                     select_columns = dummi2)
+
+df_train_d = df_train_d[, !names(df_train_d) %in% dummie]
+df_test_d  = df_test_d [, !names(df_test_d ) %in% dummi2]
+```
+
+
+```{r}
+samplesize = 0.75 * nrow(df_train_d)
+set.seed(15)
+index = sample(nrow(df_train_d),size = samplesize)
+# creating training and test set
+df_train = df_train_d[index,]
+df_valid = df_train_d[-index,]
+d_train_y = train_y[index,]
+d_valid_y = train_y[-index,]
+```
+
+```{r}
+train_data_xgb = xgb.DMatrix(as(as.matrix(df_train), "dgCMatrix"), 
+                             label = d_train_y) # dtrain
+valid_data_xgb = xgb.DMatrix(as(as.matrix(df_valid), "dgCMatrix"), 
+                             label = d_valid_y)
+test_data_xgb  = xgb.DMatrix(as(as.matrix(df_test_d ), "dgCMatrix"),
+                             label = rep(0, dim(df_test_d)[1]))
+```
+
+#--------------------------------------------
+
+# random/grid search procedure and attempt to find better accuracy
+
+
+```{r}
+#create tasks
+library(mlr)
+d_valid_y = d_valid_y %>% as.factor()
+d_train_y = d_train_y %>% as.factor()
+df_tr_d_search = cbind(df_train, d_train_y)
+df_te_d_search = cbind(df_valid, d_valid_y)
+traintask <- makeClassifTask(data = df_tr_d_search, target = "d_train_y")
+
+#--------------------------------------------
+validtask <- makeClassifTask(data = df_te_d_search, target = "d_valid_y")
+#--------------------------------------------
+test_target = data.frame(d_train_y = rep(0, dim(df_test_d)[1]) %>% as.factor())
+df_test_d_search = cbind(df_test_d, test_target)
+testtask <- makeClassifTask(data = df_test_d_search, target = 'd_train_y')
+```
+
+```{r}
+lrn <- makeLearner("classif.xgboost", 
+                   predict.type = "response")
+lrn$par.vals <- list(objective="binary:logistic", 
+                     eval_metric="error", 
+                     nrounds=100L, 
+                     eta=0.1)
+```
+
+```{r}
+library(parallel)
+library(parallelMap) 
+parallelStartSocket(cpus = detectCores())
+```
+
+```{r}
+#set parameter space
+params <- makeParamSet(makeDiscreteParam("booster", values = c("gbtree","gblinear")),
+                       makeIntegerParam("max_depth", lower = 4L,upper = 11L),
+                       makeNumericParam("min_child_weight", lower = 1L,upper = 10L),
+                       makeNumericParam("subsample", lower = 0.5,upper = .95),
+                       makeNumericParam("colsample_bytree", lower = 0.5,upper = 1))
+
+#set resampling strategy
+rdesc <- makeResampleDesc("CV", iters=10L, stratify = T)
+ctrl  <- makeTuneControlRandom(maxit = 100L)
+```
+
+#--------------------------------------------
+## search!
+
+```{r}
+#parameter tuning
+mytune <- tuneParams(learner = lrn, 
+                     task = traintask, 
+                     resampling = rdesc, 
+                     measures = mmce, 
+                     par.set = params, 
+                     control = ctrl, 
+                     show.info = T)
+mytune$y 
+mytune$x
+mytune
+```
+
+```{r}
+lrn_tune <- setHyperPars(lrn, par.vals = mytune$x)
+# saveRDS(lrn_tune, "./tuned_XGB_titanic.rds")
+#train model
+xgmodel <- train(learner = lrn_tune, task = traintask)
+
+#predict model
+# xgpred_v <- predict(xgmodel, validtask)
+xgpred <- predict(xgmodel, testtask)
+```
+
+```{r}
+# confusionMatrix(xgpred$data$response, xgpred$data$truth)
+```
+
+```{r}
+sub = read.csv("./gender_submission.csv")
+sub$target = xgpred$data$response
+write.csv(sub, "./submission_R_XGB_tuned.csv", row.names = F)
+```
