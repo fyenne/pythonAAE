@@ -16,7 +16,9 @@ tests$title[tests$`n()` < 8] = 'rare'
 
 #--create "alone"------------------------------------------
 drop1 = c('Pclass', 'Age', 'Name', 'Embarked', 
-          'Cabin', "PassengerId", "n()", "WikiId")
+          'Cabin', 
+          # "PassengerId", 
+          "n()", "WikiId")
 train = train[, !names(train) %in% drop1]
 tests = tests[, !names(tests) %in% drop1]
 
@@ -81,4 +83,6 @@ train$Class = na.fill(train$Class, "extend")
 tests$Class = na.fill(tests$Class, "extend")
 tests$Fare = na.fill(tests$Fare, "extend")
  
- 
+tests = tests[order(tests$PassengerId),] %>% data.frame(row.names = c(1:418))
+
+tests = tests[, !names(tests) %in% "PassengerId"]

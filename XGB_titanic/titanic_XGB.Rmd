@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
  
 
 ```{r cars}
-library(caret)
+library(mlr)
 library(tidyverse)
 library(xgboost)
 library("Matrix")
@@ -43,14 +43,14 @@ train$Destination = stri_trans_general(train$Destination, id = "Latin")
 # dummi2 = names(tests)[!names(tests) %in% 
 #                         c("Age_wiki", "Parch", "SibSp", "Fare", "Body", "Lifeboat")]
 str(train)
-
+tests$Survived = "0" %>% as.factor()
 cols.num <- c("title","Survived","Sex","Hometown","Boarded","Destination",
               "Lifeboat", "Body", "Class", "alone")
 train[cols.num] <- lapply(train[cols.num], as.factor)
 # delete survived
 tests[cols.num] <- lapply(tests[cols.num], as.factor)
 
-grep(train$Lifeboat)
+
 
 # train$Class = train$Class %>% as.factor()
 # train$Ticket_num_len = train$Ticket_num_len %>% as.factor()
@@ -84,31 +84,23 @@ grep(train$Lifeboat)
 
 df_train_d = train
 df_test_d  = tests
-
+# tests = df_test_d
 # train$Body = str_extract(train$Body, "\\d")
 # tests$Body = str_extract(tests$Body, "\\d")
 train = train[,! names(train) %in% c("Hometown", "Destination")]
+tests = tests[,! names(tests) %in% c("Hometown", "Destination")]
 ```
 
 
 ```{r}
-# samplesize = 0.75 * nrow(df_train_d)
-# set.seed(15)
-# index = sample(nrow(df_train_d),size = samplesize)
-# # creating training and test set
-# df_train = df_train_d[index,]
-# df_valid = df_train_d[-index,]
-# d_train_y = train_y[index] %>% data.frame()
-# d_valid_y = train_y[-index]%>% data.frame()
+train$Body = str_extract(train$Body, "\\d+") %>% as.numeric()
+tests$Body = str_extract(tests$Body, "\\d+") %>% as.numeric()
 ```
 
 ```{r}
 #create tasks
-library(mlr)
-# df_tr_d_search = cbind(df_train, d_train_y)
-# df_te_d_search = cbind(df_valid, d_valid_y)
-# names(df_tr_d_search)[15] = "target"
-# names(df_te_d_search)[15] = "target"
+
+ 
 
 imp = impute(train, target = "Survived", 
        classes = list(numeric = imputeMedian(),
@@ -116,32 +108,84 @@ imp = impute(train, target = "Survived",
 
 imp$data[1:23,]
 
+#--------------------------------------------
+
+imp2$data
+ 
+imp2 = impute(tests, target = "Survived", 
+       classes = list(numeric = imputeMedian(),
+                      factor  = imputeMode()))
+soy2 = createDummyFeatures(imp2$data, target="Survived") # 85
+soy  = createDummyFeatures(imp$data, target="Survived")
+
+#--------------------------------------------
+void_col = names(soy)[!names(soy) %in% names(soy2)]
+(names(soy2)[!names(soy2) %in% names(soy)])
+void_col
+
+soy2 = rename(soy2, "Lifeboat.14." = "Lifeboat.15.")
+# soy2 = rename(soy2, "Lifeboat.14." = "Lifeboat.A.64.")
+
+soy2$Lifeboat.A[which(soy2$Lifeboat.A.64. == 1)] = 1
+soy2 = soy2[,!names(soy2) %in% "Lifeboat.A.64."]
+soy2 = soy2[,names(soy)]
 ```
 
 ```{r}
 
-soy = createDummyFeatures(imp$data, target="Survived", method = "reference")
 tsk = makeClassifTask(data = soy, target="Survived")
 ho = makeResampleInstance("Holdout", tsk)
 tsk.train = subsetTask(tsk, ho$train.inds[[1]])
 tsk.test = subsetTask(tsk, ho$test.inds[[1]])
  
+testtask <- makeClassifTask(data = soy2, target = 'Survived')
+#--------------------------------------------
 
 
 lrn = makeLearner("classif.xgboost",nrounds=10)
 cv  = makeResampleDesc("CV",iters=5)
-res = resample(lrn,tsk.train,cv,acc)
+res = resample(lrn, tsk.train, cv, acc)
 
 ps = makeParamSet(makeNumericParam("eta",0,1), 
                   makeNumericParam("lambda",0,200),
                   makeIntegerParam("max_depth",1,20))
+                  # makeDiscreteParam("booster", values = c("gbtree","gblinear")),
+                  #      # makeIntegerParam("max_depth", lower = 1L,upper = 11L),
+                  # makeNumericParam("min_child_weight", lower = 1L,upper = 10L),
+                  # makeNumericParam("subsample", lower = 0.5,upper = .95),
+                  # makeNumericParam("colsample_bytree", lower = 0.5,upper = 1))
+#--------------------------------------------
 
-tc = makeTuneControlMBO(budget=100)
+tc = makeTuneControlMBO(budget=60)
 tr = tuneParams(lrn, tsk.train, cv5, acc, ps, tc)
 lrn = setHyperPars(lrn, 
                    par.vals=tr$x)
 
+#--------------------------------------------
+
+
+mdl = train(lrn, tsk.train)
+prd = predict(mdl, tsk.test)
+calculateConfusionMatrix(prd)
+
+# mdl
 ```
+
+
+```{r}
+# train on full
+mdl_pred = train(lrn, tsk)
+
+prdd = predict(mdl, testtask)
+#--------------------------------------------
+
+sub = read.csv("./data/gender_submission.csv")
+sub$Survived = prdd$data$response
+write.csv(sub, "./sub_XGB_full.csv", row.names = F)
+```
+
+
+
 
 #--------------------------------------------
 
