@@ -87,7 +87,7 @@ df_test_d  = tests
 
 # train$Body = str_extract(train$Body, "\\d")
 # tests$Body = str_extract(tests$Body, "\\d")
-# train = train[,! names(train) %in% "Hometown"]
+train = train[,! names(train) %in% c("Hometown", "Destination")]
 ```
 
 
@@ -135,6 +135,7 @@ res = resample(lrn,tsk.train,cv,acc)
 ps = makeParamSet(makeNumericParam("eta",0,1), 
                   makeNumericParam("lambda",0,200),
                   makeIntegerParam("max_depth",1,20))
+
 tc = makeTuneControlMBO(budget=100)
 tr = tuneParams(lrn, tsk.train, cv5, acc, ps, tc)
 lrn = setHyperPars(lrn, 
