@@ -29,5 +29,21 @@ train$Cabin2[which((train$Cabin2) == "")] = "N"
 tests$Cabin2 = c(tests$Cabin %>% str_sub(1, 1))
 tests$Cabin2[which((tests$Cabin2) == "")] = "N"
 #--------------------------------------------
-is.na(str_extract(train$Ticket, '^\\d'))
-str_extract(train$Ticket, '[[:alpha:]]')
+train$Ticket_num = "0"
+train$Ticket_num[which(is.na(str_extract(train$Ticket, '^\\d')) == F)] = "1"
+train$Ticket_num_len[train$Ticket_num == "1"] = 
+  sapply(
+    sapply(train$Ticket[train$Ticket_num == "1"], 
+           as.numeric), 
+    str_length) %>% array()
+
+tests$Ticket_num = "0"
+tests$Ticket_num[which(is.na(str_extract(tests$Ticket, '^\\d')) == F)] = "1"
+#--------------------------------------------
+train$Ticket = gsub('[[:punct:]]', "", train$Ticket)
+tests$Ticket = gsub('[[:punct:]]', "", tests$Ticket)
+
+train$Ticket = str_extract(train$Ticket, '^[[:alpha:]]+')
+
+
+
