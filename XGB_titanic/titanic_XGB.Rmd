@@ -26,39 +26,54 @@ load("~/Downloads/booooks/semester5/pythonAAE/XGB_titanic/clean.RData")
 # train = read.csv("./train.csv")
 # test  = read.csv("./test.csv")
 # train_y = read.csv("./target.csv")
-names(train)
-train_y = train$Survived
-train = train[,-2]
+# names(train)
+# train_y = train$Survived
+# train = train[,-2]
 train = train[, !names(train) %in% "Name_wiki"]
 tests = tests[, !names(tests) %in% "Name_wiki"]
+
 ```
 
 ```{r}
-dummie = names(train)[!names(train) %in% 
-                        c("Age_wiki", "Parch", "SibSp", "Fare", "Body", "Lifeboat")]
-dummi2 = names(tests)[!names(tests) %in% 
-                        c("Age_wiki", "Parch", "SibSp", "Fare", "Body", "Lifeboat")]
+# dummie = names(train)[!names(train) %in% 
+#                         c("Age_wiki", "Parch", "SibSp", "Fare", "Body", "Lifeboat")]
+# dummi2 = names(tests)[!names(tests) %in% 
+#                         c("Age_wiki", "Parch", "SibSp", "Fare", "Body", "Lifeboat")]
 str(train)
-train$Class = train$Class %>% as.factor()
-train$Ticket_num_len = train$Ticket_num_len %>% as.factor()
-tests$Class = tests$Class %>% as.factor()
-tests$Ticket_num_len = tests$Ticket_num_len %>% as.factor()
-train$Lifeboat = train$Lifeboat %>% as.numeric()
+
+cols.num <- c("title","Survived","Sex","Hometown","Boarded","Destination",
+              "Lifeboat", "Body", "Class", "alone")
+train[cols.num] <- lapply(train[cols.num], as.factor)
+# delete survived
+tests[cols.num] <- lapply(tests[cols.num], as.factor)
+
+# train$Class = train$Class %>% as.factor()
+# train$Ticket_num_len = train$Ticket_num_len %>% as.factor()
+# tests$Class = tests$Class %>% as.factor()
+# tests$Ticket_num_len = tests$Ticket_num_len %>% as.factor()
+
+# train$Lifeboat = train$Lifeboat %>% as.factor()
+# tests$Lifeboat = tests$Lifeboat %>% as.factor()
+
+# train$Lifeboat = na.fill(train$Lifeboat, NA)
+# tests$Lifeboat = na.fill(tests$Lifeboat, NA)
+# train$Body = na.fill(train$Body, NA)
+# tests$Body = na.fill(tests$Body, NA)
 #--------------------------------------------
 
-df_train_d = fastDummies::dummy_cols(train, 
-                                     select_columns = dummie)
-
-df_test_d  = fastDummies::dummy_cols(tests, 
-                                     select_columns = dummi2)
-
-df_train_d = df_train_d[, !names(df_train_d) %in% dummie]
-df_test_d  = df_test_d [, !names(df_test_d ) %in% dummi2]
-
-names(df_train_d)[which(!names(df_train_d) %in% names(df_test_d))]
-df_test_d$Embarked_ = 0
-df_test_d$Cabin2_T  = 0
-df_test_d = df_test_d[,names(df_train_d)]
+# df_train_d = fastDummies::dummy_cols(train, 
+#                                      select_columns = dummie)
+# 
+# df_test_d  = fastDummies::dummy_cols(tests, 
+#                                      select_columns = dummi2)
+# 
+# df_train_d = df_train_d[, !names(df_train_d) %in% dummie]
+# df_test_d  = df_test_d [, !names(df_test_d ) %in% dummi2]
+# 
+# names(df_train_d)[which(!names(df_train_d) %in% names(df_test_d))]
+# df_test_d$Embarked_ = 0
+# df_test_d$Cabin2_T  = 0
+# df_test_d = df_test_d[,names(df_train_d)]
 
 #--------------------------------------------
 
@@ -68,23 +83,54 @@ df_test_d  = tests
 
 
 ```{r}
-samplesize = 0.75 * nrow(df_train_d)
-set.seed(15)
-index = sample(nrow(df_train_d),size = samplesize)
-# creating training and test set
-df_train = df_train_d[index,]
-df_valid = df_train_d[-index,]
-d_train_y = train_y[index,]
-d_valid_y = train_y[-index,]
+# samplesize = 0.75 * nrow(df_train_d)
+# set.seed(15)
+# index = sample(nrow(df_train_d),size = samplesize)
+# # creating training and test set
+# df_train = df_train_d[index,]
+# df_valid = df_train_d[-index,]
+# d_train_y = train_y[index] %>% data.frame()
+# d_valid_y = train_y[-index]%>% data.frame()
 ```
 
 ```{r}
-train_data_xgb = xgb.DMatrix(as(as.matrix(df_train), "dgCMatrix"), 
-                             label = d_train_y) # dtrain
-valid_data_xgb = xgb.DMatrix(as(as.matrix(df_valid), "dgCMatrix"), 
-                             label = d_valid_y)
-test_data_xgb  = xgb.DMatrix(as(as.matrix(df_test_d ), "dgCMatrix"),
-                             label = rep(0, dim(df_test_d)[1]))
+#create tasks
+library(mlr)
+# df_tr_d_search = cbind(df_train, d_train_y)
+# df_te_d_search = cbind(df_valid, d_valid_y)
+# names(df_tr_d_search)[15] = "target"
+# names(df_te_d_search)[15] = "target"
+
+imp = impute(train, target = "Survived", 
+       classes = list(numeric = imputeMedian(),
+                      factor  = imputeMode(),
+                      character = imputeMode()))
+
+imp$data$title %>% as.factor() %>% str
+```
+
+```{r}
+
+soy = createDummyFeatures(imp$data, target="Survived")
+tsk = makeClassifTask(data = soy, target="Survived")
+ho = makeResampleInstance("Holdout", tsk)
+tsk.train = subsetTask(tsk, ho$train.inds[[1]])
+tsk.test = subsetTask(tsk, ho$test.inds[[1]])
+ 
+
+
+lrn = makeLearner("classif.xgboost",nrounds=10)
+cv  = makeResampleDesc("CV",iters=5)
+res = resample(lrn,tsk.train,cv,acc)
+
+ps = makeParamSet(makeNumericParam("eta",0,1), 
+                  makeNumericParam("lambda",0,200),
+                  makeIntegerParam("max_depth",1,20))
+tc = makeTuneControlMBO(budget=100)
+tr = tuneParams(lrn, tsk.train, cv5, acc, ps, tc)
+lrn = setHyperPars(lrn, 
+                   par.vals=tr$x)
+
 ```
 
 #--------------------------------------------
@@ -93,12 +139,14 @@ test_data_xgb  = xgb.DMatrix(as(as.matrix(df_test_d ), "dgCMatrix"),
 
 
 ```{r}
-#create tasks
-library(mlr)
+
 d_valid_y = d_valid_y %>% as.factor()
 d_train_y = d_train_y %>% as.factor()
 df_tr_d_search = cbind(df_train, d_train_y)
 df_te_d_search = cbind(df_valid, d_valid_y)
+
+
+
 traintask <- makeClassifTask(data = df_tr_d_search, target = "d_train_y")
 
 #--------------------------------------------
