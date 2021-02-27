@@ -35,6 +35,9 @@ tests = tests[, !names(tests) %in% "Name_wiki"]
 ```
 
 ```{r}
+library(stringi)
+train$Hometown = stri_trans_general(train$Hometown, id = "Latin")
+train$Destination = stri_trans_general(train$Destination, id = "Latin")
 # dummie = names(train)[!names(train) %in% 
 #                         c("Age_wiki", "Parch", "SibSp", "Fare", "Body", "Lifeboat")]
 # dummi2 = names(tests)[!names(tests) %in% 
@@ -46,6 +49,8 @@ cols.num <- c("title","Survived","Sex","Hometown","Boarded","Destination",
 train[cols.num] <- lapply(train[cols.num], as.factor)
 # delete survived
 tests[cols.num] <- lapply(tests[cols.num], as.factor)
+
+grep(train$Lifeboat)
 
 # train$Class = train$Class %>% as.factor()
 # train$Ticket_num_len = train$Ticket_num_len %>% as.factor()
@@ -79,6 +84,10 @@ tests[cols.num] <- lapply(tests[cols.num], as.factor)
 
 df_train_d = train
 df_test_d  = tests
+
+# train$Body = str_extract(train$Body, "\\d")
+# tests$Body = str_extract(tests$Body, "\\d")
+# train = train[,! names(train) %in% "Hometown"]
 ```
 
 
@@ -103,15 +112,15 @@ library(mlr)
 
 imp = impute(train, target = "Survived", 
        classes = list(numeric = imputeMedian(),
-                      factor  = imputeMode(),
-                      character = imputeMode()))
+                      factor  = imputeMode()))
 
-imp$data$title %>% as.factor() %>% str
+imp$data[1:23,]
+
 ```
 
 ```{r}
 
-soy = createDummyFeatures(imp$data, target="Survived")
+soy = createDummyFeatures(imp$data, target="Survived", method = "reference")
 tsk = makeClassifTask(data = soy, target="Survived")
 ho = makeResampleInstance("Holdout", tsk)
 tsk.train = subsetTask(tsk, ho$train.inds[[1]])
