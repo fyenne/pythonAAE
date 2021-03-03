@@ -565,8 +565,6 @@ print("Categorical variables:")
 print(object_cols)
 ```
 
-
-
 ### drop:
 
 ```python
