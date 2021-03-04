@@ -13,7 +13,7 @@ According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning
 * both regression and classification
 * top-down, greedy approach that is known as recursive binary splitting. It is greedy because at each step of the tree-building process, the **best split is made at that particular step** 
 * a better strategy is to grow a very large tree T0, and then prune it back in order to obtain a subtree to avoid overfitting problem.
-* non robust and low accuracy.
+* non robust and low accuracy.  
 
 ```python
 from sklearn.ensemble import DecisionTreeRegressor
