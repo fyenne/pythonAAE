@@ -11,6 +11,6 @@ learning python from AAE course at UWMadison
 .722
 ~~~
 
-haha
+tensor died
 
 `adding Pytorch and Tensorflow`
