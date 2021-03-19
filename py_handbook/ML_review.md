@@ -4,7 +4,7 @@
 
 `01,2021`
 
-According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
+According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `a
 
 ---
 
