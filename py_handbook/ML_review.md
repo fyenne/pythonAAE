@@ -4,7 +4,7 @@
 
 `01,2021`
 
-According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `a
+According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
 
 ---
 
@@ -1338,7 +1338,7 @@ sys.path.append('/Users/fyenne/.env/lib/python3.7/site-packages')
 
 ```python
 import spacy
-nlp = spacy.load('en')
+nlp = spacy.load('en') # english dictionary
 doc = nlp("Tea is healthy and calming, don't you think?")
 for token in doc:
     print(token)
