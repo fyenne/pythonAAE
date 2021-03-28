@@ -1546,6 +1546,10 @@ for i in range(n_iters):
 
 
 
+# NLP book
+
+
+
 
 
 #  LDA model:
