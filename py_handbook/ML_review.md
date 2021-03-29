@@ -1548,6 +1548,53 @@ for i in range(n_iters):
 
 # NLP book
 
+`based on kaggle disaster twitter `
+
+notes from: 
+
+```html
+https://www.kaggle.com/ghaiyur/ensemble-models-version
+https://www.kaggle.com/zinebkhanjari/disaster-tweets-multiple-vectorizers-and-models
+https://www.kaggle.com/gunesevitan/nlp-with-disaster-tweets-eda-cleaning-and-bert
+```
+
+## Simple walk throu
+
+```python
+from sklearn import feature_extraction, linear_model, model_selection, preprocessing
+count_vectorizer = feature_extraction.text.CountVectorizer()
+
+# basically its one hot encoding, dimension 
+print(example_train_vectors[0].todense().shape) # > (1, 54) # 54 tokens in total and equal to zero when not existing in specific row. out format like: 
+[0 0 0 1 1 1 0 0 0 0 0 0 1 1 0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 1 0]
+#--------------------------------------------
+train_vectors = count_vectorizer.fit_transform(train_df["text"])
+## note that we're NOT using .fit_transform() here. Using just .transform() makes sure
+# that the tokens in the train vectors are the only ones mapped to the test vectors - 
+# i.e. that the train and test vectors use the same set of tokens.
+test_vectors = count_vectorizer.transform(test_df["text"])
+#--------------------------------------------
+# model up
+clf = linear_model.RidgeClassifier()
+# cross-validation check accuracy
+scores = model_selection.cross_val_score(clf,
+                                         train_vectors,
+                                         train_df["target"], cv=4, scoring="f1")
+# fit the data set.
+clf.fit(train_vectors, train_df["target"])
+# done
+```
+
+## serious data preprocession and modeling:
+
+```python
+# 1.1 Automated Preprocessing with dabl
+# titanic_df_clean = dabl.clean(titanic_df, verbose=1)
+
+# import missingno as msno
+# msno.bar(titanic_df)
+```
+
 
 
 
@@ -1555,6 +1602,8 @@ for i in range(n_iters):
 #  LDA model:
 
 ![Screen Shot 2021-02-09 at 4.22.01 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/Screen Shot 2021-02-09 at 4.22.01 PM.png)
+
+LDA 对 predictors: X 分别在different response classes 中进行distribution analysis. 
 
 ` Why LDA?`
 
