@@ -4,7 +4,7 @@
 
 `01,2021`
 
-According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R  `
+According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning in R`
 
 ---
 
@@ -21,7 +21,7 @@ from sklearn.model_selection import train_test_split
 # split data into training and validation data, for both features and target
 # The split is based on a random number generator. Supplying a numeric value to
 # the random_state argument guarantees we get the same split every time we
-# run this script.
+# run this script....
 train_X, val_X, train_y, val_y = train_test_split(X, y, random_state = 1)
 # Define model
 melbourne_model = DecisionTreeRegressor(random_state = 1)
