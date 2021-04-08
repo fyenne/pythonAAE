@@ -133,7 +133,7 @@ print("Validation MAE for Random Forest Model: {}".format(rf_val_mae))
 # Validation MAE for best value of max_leaf_nodes: 27,283
 ```
 
-## write a random forrest Parameter choosing function:
+## write a random forest Parameter choosing function:
 
 ```python
 def get_mae_rf(n_estimators, #max_depth,  # para s
@@ -481,7 +481,6 @@ search_result = gp_minimize(func=fitness,
 missing_val_count_by_column = (X_train.isnull().sum())
 print(missing_val_count_by_column[missing_val_count_by_column > 0])
 
-<center><span style="font-size:42px;color:#8B30BB;">Machine Learning Review:  </center></span>
 ```
 
 ### drop NAs
@@ -737,7 +736,6 @@ preprocessor = ColumnTransformer(
 
 ```python
 from sklearn.ensemble import RandomForestRegressor
-
 model = RandomForestRegressor(n_estimators=100, random_state=0)
 ```
 
