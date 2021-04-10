@@ -2,13 +2,96 @@
 
 
 
-source from programiz.com; kaggle.com; calmcode.io
+source from programiz.com;  calmcode.io; kaggle.com;
 
 `by Siming Yan` @ www.fyenneyenn.studio
 
 
 
 ---
+
+# install
+
+本文选择使用`miniconda + pycharm` 或者 `miniconda + visual studio code`
+
+如果已经安装了python, 有python基础, 或者已经安装了 anaconda等ide可以略过第一部分
+
+
+
+## miniconda
+
+`本部分参考自 https://www.cnblogs.com/ruhai/p/10847220.html`
+
+a. Download:
+
+`https://docs.conda.io/en/latest/miniconda.html`  官网
+
+`https://repo.anaconda.com/miniconda/` 或者通过清华大学镜像
+
+选择适合自己的版本进行安装: 如mac系统, 选择(64 pkg 文件)完成快速安装 
+
+| Python version | Name                                                         | Size     | SHA256 hash                                                  |
+| -------------- | ------------------------------------------------------------ | -------- | ------------------------------------------------------------ |
+| Python 3.9     | [Miniconda3 MacOSX 64-bit bash](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-MacOSX-x86_64.sh) | 42.2 MiB | `b3bf77cbb81ee235ec6858146a2a84d20f8ecdeb614678030c39baacb5acbed1` |
+|                | [Miniconda3 MacOSX 64-bit pkg](https://repo.anaconda.com/miniconda/Miniconda3-py39_4.9.2-MacOSX-x86_64.pkg) | 49.7 MiB | `298ff80803817921a98e21d81d60f93b44afce67aec8ae492d289b13741bcffe` |
+| Python 3.8     | [Miniconda3 MacOSX 64-bit bash](https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh) | 54.5 MiB | `a9ea0afba55b5d872e01323d495b649eac8ff4ce2ea098fb4c357b6139fe6478` |
+|                | [Miniconda3 MacOSX 64-bit pkg](https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.pkg) | 62.0 MiB | `b06f3bf3cffa9b53695c9c3b8da05bf583bc7047d45b0d74492f154d85e317fa` |
+
+b. 验证安装 
+
+打开terminal(终端):
+
+输入`conda -V` 验证安装, 注意大写V.
+
+c. 添加miniforge到环境变量:
+
+打开terminal, 输入:
+
+```bash
+sudo nano /etc/paths
+```
+
+---
+
+因为很多包开发于国外, 下载速度慢, 所以在terminal中建议粘贴以下命令, 使得默认下载链接为国内的地址.
+
+```bash
+# 清华的镜像源
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge 
+conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/msys2/
+
+# 中国科技大学源
+conda config --add channels https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
+conda config --add channels https://mirrors.ustc.edu.cn/anaconda/pkgs/free/
+conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
+conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/
+conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
+conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
+
+# 阿里云的服务器
+# http://mirrors.aliyun.com/pypi/simple/ 
+# 豆瓣网站是用python做的呀 豆瓣的python的源
+# conda config --add channels http://pypi.douban.com/simple/ 
+```
+
+```bash
+# 两个基本的设置, 可以自行选择是否添加.
+# 设置搜索时显示通道地址
+conda config --set show_channel_urls yes
+# 当安装包时，总会被询问是否`Proceed ([y]/n)?` ，默认为False，设置为`always_yes: True`将不会再做提醒
+conda config --set always_yes True
+```
+
+---
+
+创造虚拟环境以**科学**使用python:
+
+```bash
+# 打开 terminal 输入
+# 将 你起个名字 替换成任意英文名字
+conda create -n 你起个名字 python=3.8
+```
 
 # input and output.
 
@@ -71,7 +154,9 @@ print(hw12)  # prints "hello world 12"
 作用：
 后面字符串以 Unicode 格式 进行编码，一般用在中文字符串前面，防止因为源码储存格式问题，导致再次使用时出现乱码。
 `字符串前加 r`
-例：r"\n\n\n\n”　　# 表示一个普通生字符串 \n\n\n\n，而不表示换行了。
+例：r"\n\n\n\n”　　
+
+`# 表示一个普通raw data 生字符串 \n\n\n\n，而不表示换行了。`
 作用：
 去掉反斜杠的转移机制。
 (特殊字符：即那些，反斜杠加上对应字母，表示对应的特殊含义的，比如最常见的”\n”表示换行，”\t”表示Tab等。 )
