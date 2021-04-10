@@ -478,8 +478,6 @@ function(1,2,3,4)
     10
     7
 
-
-
 ```python
 def function(a, b, *args, keyword = True, **kwargs):
     # **kwargs a dictionary; named arguments in the following function
@@ -499,7 +497,3 @@ function(1,2,3,4, wo = 'sb')
     sb
 
 
-
-```python
-
-```
