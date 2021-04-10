@@ -51,6 +51,7 @@ docs/
 po/*~
 
 /pics/
+*.pdf
  
 
  
