@@ -6,7 +6,7 @@ source from programiz.com;  calmcode.io; kaggle.com;
 
 `by Siming Yan` @ www.fyenneyenn.studio
 
-
+同步更新 @ https://fyenneyenn.gitee.io/pythonaae
 
 ---
 
@@ -15,8 +15,6 @@ source from programiz.com;  calmcode.io; kaggle.com;
 本文选择使用`miniconda + pycharm` 或者 `miniconda + visual studio code`
 
 如果已经安装了python, 有python基础, 或者已经安装了 anaconda等ide可以略过第一部分
-
-
 
 ## miniconda
 
@@ -49,11 +47,19 @@ c. 添加miniforge到环境变量:
 
 ```bash
 sudo nano /etc/paths
+# 输入你的开机密码; 按回车
+# 在terminal的文本编辑器里继续输入
+# /Users/你的电脑用户名字/miniforge3/bin 如:狗蛋儿
+#按esc 
+#输入 
+#:wq 
+#以退出
+#记得保存
 ```
 
 ---
 
-因为很多包开发于国外, 下载速度慢, 所以在terminal中建议粘贴以下命令, 使得默认下载链接为国内的地址.
+因为很多包开发于国外, 下载速度慢, 所以在terminal中建议粘贴以下命令, 使得默认下载链接为国内的镜像地址.
 
 ```bash
 # 清华的镜像源
@@ -85,13 +91,55 @@ conda config --set always_yes True
 
 ---
 
-创造虚拟环境以**科学**使用python:
+创造虚拟环境以_**科学**_地使用python:
 
 ```bash
 # 打开 terminal 输入
 # 将 你起个名字 替换成任意英文名字
 conda create -n 你起个名字 python=3.8
+# 验证虚拟环境是否成功搭建
+conda info --envs # 输出虚拟环境目录
 ```
+
+```bash
+# base                  	 *  /Users/你的用户名字/miniforge3
+# 你起个名字                   /Users/你的用户名字/miniforge3/envs/你起个名字
+```
+
+启动环境
+
+```bash
+conda activate 你起个名字 # 启动环境
+python -V # 验证python
+# 输出为
+# Python 3.8.6 
+```
+
+安装成功! 
+
+# vscode or pycharm even R studio
+
++ 下载vscode
+
+`https://code.visualstudio.com/Download` 
+
++ 或者学生可以使用免费的一年期限的pycharm professional
+
+`https://www.jetbrains.com/pycharm/download/#section=mac`
+
++ 想要在Rstudio中使用python conda environment
+
+需要通过conda 重新安装R; 
+
+`conda install R` 设置比较麻烦, 不做赘述.
+
+
+
+建议使用`vscode`因为主题比较好看.
+
+在vscode中安装python 插件, jupyter 插件
+
+
 
 # input and output.
 
@@ -113,7 +161,7 @@ print(6**3) # power
     4
 
 ```python
-x = 3; y = 'S'; z = 'zhen\de\t\hen\nan'
+x = 3; y = 'S'
 print('The value of x is {} and y is {}'.format(x,y))
 x = 12.345678900
 print('%.2d' %x) # or i, integer.
@@ -123,9 +171,11 @@ print('%.4e' %x) # scientific format
 print('%4u'  %x) # with indent
 print('%.4u' %x) # with number indent
 print( '%c'  %y) # one character
+
+z = 'zhen\de\t\hen\nan'
 print( '%s'  %z) # a string # \t == space, \n == new line
 print('#-------------------------------------------')
-print(r'zhen\de\t\hen\nan', '---', r'%s' %z)
+print(r'zhen\de\t\hen\nan', '\n', r'%s' %z)
 ```
 
     The value of x is 3 and y is S
@@ -139,12 +189,13 @@ print(r'zhen\de\t\hen\nan', '---', r'%s' %z)
     zhen\de	\hen
     an
     #-------------------------------------------
-    zhen\de\t\hen\nan --- zhen\de	\hen
+    zhen\de\t\hen\nan
+    zhen\de	\hen
     an
 
 ```python
 hw12 = '%s %s %d' % ('hello this', 'world', 12)  # sprintf style string formatting
-print(hw12)  # prints "hello world 12"
+print(hw12) 
 ```
 
     hello this world 12
