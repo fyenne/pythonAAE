@@ -1,0 +1,172 @@
+<html>
+<head>
+<title>python_kag.ipynb</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #7f8c99;}
+.s1 { color: #dfdfe0;}
+.s2 { color: #d7c781;}
+.s3 { color: #ff806c;}
+.s4 { color: #fcfcfc;}
+.s5 { color: #f97bb0; font-weight: bold;}
+.s6 { color: #629755; font-style: italic;}
+.ls0 { height: 1px; border-width: 0; color: #4d4d4d; background-color:#4d4d4d}
+</style>
+</head>
+<body bgcolor="#292a30">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+python_kag.ipynb</font>
+</center></td></tr></table>
+<pre><span class="s0">#%% md 
+</span>
+<span class="s1"># python data science for primary school students 
+ <hr class="ls0"></span><span class="s0">#%% md 
+</span><span class="s1">source from programiz.com; kaggle.com; calmcode.io 
+ 
+`by Siming Yan` @ www.fyenneyenn.studio 
+ 
+--- 
+ <hr class="ls0"></span><span class="s0">#%% md 
+</span>
+<span class="s1">## input and output. 
+ <hr class="ls0"></span><span class="s0">#%% 
+</span><span class="s1">print(</span><span class="s2">1</span><span class="s1">+</span><span class="s2">1</span><span class="s1">)</span>
+<span class="s1">print(</span><span class="s2">3</span><span class="s1">/</span><span class="s2">2</span><span class="s1">); </span>
+<span class="s1">print(</span><span class="s2">3</span><span class="s1">//</span><span class="s2">2</span><span class="s1">); </span><span class="s0"># 取整</span>
+<span class="s1">print(</span><span class="s2">6</span><span class="s1">%</span><span class="s2">2</span><span class="s1">) </span><span class="s0"># 取余</span>
+<span class="s1">print(</span><span class="s2">6</span><span class="s1">**</span><span class="s2">3</span><span class="s1">) </span><span class="s0"># power</span>
+<span class="s1">(</span><span class="s2">1.5</span><span class="s1">).as_integer_ratio()</span>
+<span class="s0"># print(*objects, sep=' ', end='\n', file=sys.stdout, flush=False)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">x = </span><span class="s2">3</span><span class="s1">; y = </span><span class="s3">'S'</span><span class="s1">; z = </span><span class="s3">'zhen\de</span><span class="s4">\t</span><span class="s3">\hen</span><span class="s4">\n</span><span class="s3">an'</span>
+<span class="s1">print(</span><span class="s3">'The value of x is {} and y is {}'</span><span class="s1">.format(x,y))</span>
+<span class="s1">x = </span><span class="s2">12.345678900</span>
+<span class="s1">print(</span><span class="s3">'%.2d' </span><span class="s1">%x) </span><span class="s0"># or i, integer.</span>
+<span class="s1">print(</span><span class="s3">'%.2f' </span><span class="s1">%x) </span><span class="s0"># float with 2</span>
+<span class="s1">print(</span><span class="s3">'%.4f' </span><span class="s1">%x) </span><span class="s0"># float with 4</span>
+<span class="s1">print(</span><span class="s3">'%.4e' </span><span class="s1">%x) </span><span class="s0"># scientific format</span>
+<span class="s1">print(</span><span class="s3">'%4u'  </span><span class="s1">%x) </span><span class="s0"># with indent</span>
+<span class="s1">print(</span><span class="s3">'%.4u' </span><span class="s1">%x) </span><span class="s0"># with number indent</span>
+<span class="s1">print( </span><span class="s3">'%c'  </span><span class="s1">%y) </span><span class="s0"># one character</span>
+<span class="s1">print( </span><span class="s3">'%s'  </span><span class="s1">%z) </span><span class="s0"># a string # \t == space, \n == new line</span>
+<span class="s1">print(</span><span class="s3">'#-------------------------------------------'</span><span class="s1">)</span>
+<span class="s1">print(</span><span class="s3">r'zhen\de\t\hen\nan'</span><span class="s1">, </span><span class="s3">'---'</span><span class="s1">, </span><span class="s3">r'%s' </span><span class="s1">%z)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">hw12 = </span><span class="s3">'%s %s %d' </span><span class="s1">% (</span><span class="s3">'hello this'</span><span class="s1">, </span><span class="s3">'world'</span><span class="s1">, </span><span class="s2">12</span><span class="s1">)  </span><span class="s0"># sprintf style string formatting</span>
+<span class="s1">print(hw12)  </span><span class="s0"># prints &quot;hello world 12&quot;</span><hr class="ls0"><span class="s0">#%% md 
+</span><span class="s1">字符串前加 u 
+例：u&quot;我是含有中文字符组成的字符串。&quot; 
+作用： 
+后面字符串以 Unicode 格式 进行编码，一般用在中文字符串前面，防止因为源码储存格式问题，导致再次使用时出现乱码。 
+字符串前加 r 
+例：r&quot;\n\n\n\n”　　# 表示一个普通生字符串 \n\n\n\n，而不表示换行了。 
+作用： 
+去掉反斜杠的转移机制。 
+(特殊字符：即那些，反斜杠加上对应字母，表示对应的特殊含义的，比如最常见的”\n”表示换行，”\t”表示Tab等。 ) <hr class="ls0"></span><span class="s0">#%% 
+</span><span class="s5">import </span><span class="s1">math</span>
+<span class="s1">print(math.pi)</span>
+<span class="s5">import </span><span class="s1">sys</span>
+<span class="s1">sys.path</span><hr class="ls0"><span class="s0">#%% md 
+</span><span class="s1">## define a function <hr class="ls0"></span><span class="s0">#%% 
+</span><span class="s5">def </span><span class="s1">summ(a,b):</span>
+    <span class="s5">return </span><span class="s1">a+b</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">summ(</span><span class="s2">3</span><span class="s1">,</span><span class="s2">5</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s5">def </span><span class="s1">onetopping(ketchup, onion, mayo):</span>
+    <span class="s5">return </span><span class="s1">int(ketchup) + int(onion) + int(mayo) == </span><span class="s2">1</span>
+    <span class="s0"># values can take in this function: int</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">print(onetopping(</span><span class="s2">1</span><span class="s1">,</span><span class="s2">1</span><span class="s1">,</span><span class="s2">0</span><span class="s1">), onetopping(</span><span class="s2">0</span><span class="s1">,</span><span class="s2">0</span><span class="s1">,</span><span class="s2">1</span><span class="s1">));</span>
+<span class="s1">onetopping(</span><span class="s2">1</span><span class="s1">, -</span><span class="s2">1</span><span class="s1">, </span><span class="s2">1</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">triple = </span><span class="s5">lambda </span><span class="s1">x: x * </span><span class="s2">3</span><span class="s1">;</span>
+<span class="s0"># this would equal to def a function</span>
+<span class="s5">def </span><span class="s1">triple2(x):</span>
+    <span class="s5">return </span><span class="s1">x * </span><span class="s2">3</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">triple(</span><span class="s2">3</span><span class="s1">), triple2(</span><span class="s2">4</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% md 
+</span><span class="s1">## List in python <hr class="ls0"></span><span class="s0">#%% 
+</span><span class="s1">type([</span><span class="s2">3</span><span class="s1">,</span><span class="s2">6</span><span class="s1">,</span><span class="s2">8</span><span class="s1">,</span><span class="s2">10</span><span class="s1">,</span><span class="s2">1</span><span class="s1">,</span><span class="s2">2</span><span class="s1">,</span><span class="s2">1</span><span class="s1">])</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">a = [</span><span class="s2">1</span><span class="s1">,</span><span class="s2">2</span><span class="s1">,</span><span class="s2">3</span><span class="s1">,</span><span class="s2">4</span><span class="s1">,</span><span class="s3">&quot;5&quot;</span><span class="s1">];a</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">b = list(map(int, a));print(b)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">b.sort(reverse = </span><span class="s5">True</span><span class="s1">);b,</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">sorted(b, reverse = </span><span class="s5">False</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">planets = [</span><span class="s3">'Mercury'</span><span class="s1">, </span><span class="s3">'Venus'</span><span class="s1">, </span><span class="s3">'Earth'</span><span class="s1">, </span><span class="s3">'Mars'</span><span class="s1">, </span><span class="s3">'Jupiter'</span><span class="s1">, </span><span class="s3">'Saturn'</span><span class="s1">, </span><span class="s3">'Uranus'</span><span class="s1">, </span><span class="s3">'Neptune'</span><span class="s1">]</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">planets[</span><span class="s2">0</span><span class="s1">:], planets[</span><span class="s2">1</span><span class="s1">:-</span><span class="s2">1</span><span class="s1">], planets[:-</span><span class="s2">1</span><span class="s1">]</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">planets.append(</span><span class="s3">'Pluto'</span><span class="s1">);planets</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">planets.index(</span><span class="s3">'Earth'</span><span class="s1">), planets[</span><span class="s2">2</span><span class="s1">]</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">primes = [</span><span class="s2">2</span><span class="s1">, </span><span class="s2">3</span><span class="s1">, </span><span class="s2">5</span><span class="s1">, </span><span class="s2">7</span><span class="s1">]</span>
+<span class="s1">sum(primes), max(primes)</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">hands = [[</span><span class="s3">'J'</span><span class="s1">, </span><span class="s3">'Q'</span><span class="s1">, </span><span class="s3">'K'</span><span class="s1">], [</span><span class="s3">'2'</span><span class="s1">, </span><span class="s3">'2'</span><span class="s1">, </span><span class="s3">'2'</span><span class="s1">], [</span><span class="s3">'6'</span><span class="s1">, </span><span class="s3">'A'</span><span class="s1">, </span><span class="s3">'K'</span><span class="s1">]]</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">hands[</span><span class="s2">2</span><span class="s1">], hands[</span><span class="s2">2</span><span class="s1">][</span><span class="s2">2</span><span class="s1">], hands[</span><span class="s2">0</span><span class="s1">][</span><span class="s2">0</span><span class="s1">]</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">%time</span>
+<span class="s1">sum(range(</span><span class="s2">100</span><span class="s1">))</span>
+<hr class="ls0"><span class="s0">#%% 
+# noinspection PyBroadException</span>
+<span class="s5">def </span><span class="s1">select_second(L):</span>
+    <span class="s6">&quot;&quot;&quot;Return the second element of the given list. If the list has no second 
+    element, return None. 
+    &quot;&quot;&quot;</span>
+    <span class="s5">try</span><span class="s1">:</span>
+        <span class="s5">if </span><span class="s1">type(L[</span><span class="s2">1</span><span class="s1">]) == int </span><span class="s5">or </span><span class="s1">float:</span>
+            <span class="s5">return </span><span class="s1">L[</span><span class="s2">1</span><span class="s1">]</span>
+    <span class="s5">except</span><span class="s1">:</span>
+        <span class="s5">return None</span>
+    <span class="s5">pass</span>
+<span class="s0">#--------------------------------------------</span>
+<span class="s0"># or</span>
+<span class="s5">def </span><span class="s1">select_second2(L):</span>
+    <span class="s5">try</span><span class="s1">:</span>
+        <span class="s1">type(L[</span><span class="s2">1</span><span class="s1">]) == int </span><span class="s5">or </span><span class="s1">float</span>
+        <span class="s5">return </span><span class="s1">L[</span><span class="s2">1</span><span class="s1">]</span>
+    <span class="s5">except</span><span class="s1">:</span>
+        <span class="s5">return None</span>
+    <span class="s5">pass</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s1">L = [</span><span class="s2">2</span><span class="s1">,</span><span class="s2">3</span><span class="s1">,</span><span class="s2">4</span><span class="s1">]</span>
+<span class="s1">select_second2(L),select_second(L)</span>
+<hr class="ls0"><span class="s0">#%% 
+</span><span class="s5">def </span><span class="s1">quicksort(arr):</span>
+    <span class="s6">&quot;&quot;&quot;make a quick sort function for data lists.&quot;&quot;&quot;</span>
+    <span class="s5">if </span><span class="s1">len(arr) &lt;= </span><span class="s2">1</span><span class="s1">:</span>
+        <span class="s5">return </span><span class="s1">arr</span>
+    <span class="s1">pivot = arr[len(arr) // </span><span class="s2">2</span><span class="s1">]</span>
+    <span class="s1">left = [x </span><span class="s5">for </span><span class="s1">x </span><span class="s5">in </span><span class="s1">arr </span><span class="s5">if </span><span class="s1">x &lt; pivot]</span>
+    <span class="s1">middle = [x </span><span class="s5">for </span><span class="s1">x </span><span class="s5">in </span><span class="s1">arr </span><span class="s5">if </span><span class="s1">x == pivot]</span>
+    <span class="s1">right = [x </span><span class="s5">for </span><span class="s1">x </span><span class="s5">in </span><span class="s1">arr </span><span class="s5">if </span><span class="s1">x &gt; pivot]</span>
+    <span class="s5">return </span><span class="s1">quicksort(left) + middle + quicksort(right)</span>
+
+<span class="s1">print(quicksort([</span><span class="s2">3</span><span class="s1">,</span><span class="s2">6</span><span class="s1">,</span><span class="s2">8</span><span class="s1">,</span><span class="s2">10</span><span class="s1">,</span><span class="s2">1</span><span class="s1">,</span><span class="s2">2</span><span class="s1">,</span><span class="s2">1</span><span class="s1">]))</span>
+<hr class="ls0"><span class="s0">#%% md 
+</span><span class="s1">### args, kwargs and functions <hr class="ls0"></span><span class="s0">#%% 
+</span><span class="s5">def </span><span class="s1">multiply(*numbers): </span><span class="s0"># star marks for multiple inputs</span>
+    <span class="s1">result = </span><span class="s2">1</span>
+    <span class="s5">for </span><span class="s1">n </span><span class="s5">in </span><span class="s1">numbers:</span>
+        <span class="s1">result = result * n</span>
+    <span class="s5">return </span><span class="s1">result</span>
+
+<span class="s1">multiply(</span><span class="s2">1</span><span class="s1">,</span><span class="s2">3</span><span class="s1">,</span><span class="s2">5</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% 
+</span><span class="s5">def </span><span class="s1">function(a, b, *args):</span>
+    <span class="s0"># *args: a tuple; unnamed arguments in the following function</span>
+    <span class="s1">print(a + b + sum(args))</span>
+    <span class="s1">print(sum(args))</span>
+
+<span class="s1">function(</span><span class="s2">1</span><span class="s1">,</span><span class="s2">2</span><span class="s1">,</span><span class="s2">3</span><span class="s1">,</span><span class="s2">4</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% 
+</span>
+<span class="s5">def </span><span class="s1">function(a, b, *args, keyword = </span><span class="s5">True</span><span class="s1">, **kwargs):</span>
+    <span class="s0"># **kwargs a dictionary; named arguments in the following function</span>
+    <span class="s1">print(a + b + sum(args))</span>
+    <span class="s1">print(sum(args))</span>
+    <span class="s1">print(keyword)</span>
+    <span class="s1">print(kwargs)</span>
+    <span class="s1">df = kwargs</span>
+    <span class="s1">print(df[</span><span class="s3">'wo'</span><span class="s1">])</span>
+<span class="s1">function(</span><span class="s2">1</span><span class="s1">,</span><span class="s2">2</span><span class="s1">,</span><span class="s2">3</span><span class="s1">,</span><span class="s2">4</span><span class="s1">, wo = </span><span class="s3">'sb'</span><span class="s1">)</span><hr class="ls0"><span class="s0">#%% 
+</span>
+
+</pre>
+</body>
+</html>
