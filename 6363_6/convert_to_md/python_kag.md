@@ -135,11 +135,15 @@ python -V # 验证python
 
 
 
-建议使用`vscode`因为主题比较好看.
+*建议使用`vscode`因为主题比较好看.*
 
 在vscode中安装python 插件, jupyter 插件
 
+![Screen Shot 2021-04-10 at 10.10.45 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/pics/Screen Shot 2021-04-10 at 10.10.45 PM.jpg)
 
+cmd+shift+p 输入jupyter creat 按下回车新建一个ipynb的文件.
+
+ 或者鼠标点击左上角菜单中的 go -> go to file
 
 # input and output.
 
