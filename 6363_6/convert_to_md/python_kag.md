@@ -61,6 +61,8 @@ sudo nano /etc/paths
 
 因为很多包开发于国外, 下载速度慢, 所以在terminal中建议粘贴以下命令, 使得默认下载链接为国内的镜像地址.
 
+ps: 中科大的比清华的好用, 可以把清华的删了. (清华的同学请忽视本ps)
+
 ```bash
 # 清华的镜像源
 conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/free/
@@ -91,7 +93,7 @@ conda config --set always_yes True
 
 ---
 
-创造虚拟环境以_**科学**_地使用python:
+创造虚拟环境以_**科学**_地使用python: 因为你直接用电脑自带的环境我怕你弄坏了电脑都废了. 虚拟环境坏了还可以删库跑路就当没学过.
 
 ```bash
 # 打开 terminal 输入
@@ -117,7 +119,7 @@ python -V # 验证python
 
 安装成功! 
 
-# vscode or pycharm even R studio
+# vscode or pycharm or even R studio
 
 + 下载vscode
 
@@ -137,19 +139,25 @@ python -V # 验证python
 
 *建议使用`vscode`因为主题比较好看.*
 
+---
+
 在vscode中安装python 插件, jupyter 插件
 
 ![Screen Shot 2021-04-10 at 10.10.45 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/pics/Screen Shot 2021-04-10 at 10.10.45 PM.jpg)
 
-cmd+shift+p 输入jupyter creat 按下回车新建一个ipynb的文件.
+在vscode中按下`cmd+shift+p`输入jupyter create 后按下回车新建一个ipynb的文件.
 
- 或者鼠标点击左上角菜单中的 go -> go to file
+如此, 我们有了第一个python的脚本. 
+
+![Screen Shot 2021-04-10 at 10.40.35 PM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/pics/Screen Shot 2021-04-10 at 10.40.35 PM.png)
+
+输入` print('哈咯握的')` 按下shift+回车运行该chunk
 
 # input and output.
 
 
 ```python
-print(1+1)
+print(1+1) #  
 print(3/2); 
 print(3//2); # 取整
 print(6%2) # 取余
