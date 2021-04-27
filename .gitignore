@@ -56,3 +56,4 @@ po/*~
 
  
 .ipynb_checkpoints/
+*.jpg
