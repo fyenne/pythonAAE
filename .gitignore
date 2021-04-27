@@ -57,3 +57,4 @@ po/*~
  
 .ipynb_checkpoints/
 *.jpg
+*.tfrec
