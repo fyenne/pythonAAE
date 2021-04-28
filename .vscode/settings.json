@@ -1,4 +1,5 @@
 {
     "python.pythonPath": "/Users/fyenne/miniforge3/envs/siming/bin/python",
-    "jupyter.jupyterServerType": "local"
+    "jupyter.jupyterServerType": "local",
+    "jupyter.jupyterCommandLineArguments": []
 }
