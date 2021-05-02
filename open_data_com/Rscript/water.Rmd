@@ -135,9 +135,42 @@ Asum = train %>% group_by(year, month) %>% summarise(mean(A厂), median(A厂), v
 names(Asum)[3:5] = c("mean_a", "med_a", "sqrt_a")
 Bsum = train %>% group_by(year, month) %>% summarise(mean(B厂), median(B厂), var(B厂)^.5)
 names(Bsum)[3:5] = c("mean_b", "med_b", "sqrt_b")
-```
-```{r}
+
 sumsum = merge(Asum, Bsum, by = c('year', 'month'))
-merge(train, sumsum,  by = c('year', 'month'))
+new_train = merge(train, sumsum,  by = c('year', 'month'))
+#--------------------------------------------
+Asum = tests %>% group_by(year, month) %>% summarise(mean(A厂), median(A厂), var(A厂)^.5)
+names(Asum)[3:5] = c("mean_a", "med_a", "sqrt_a")
+Bsum = tests %>% group_by(year, month) %>% summarise(mean(B厂), median(B厂), var(B厂)^.5)
+names(Bsum)[3:5] = c("mean_b", "med_b", "sqrt_b")
+
+sumsum = merge(Asum, Bsum, by = c('year', 'month'))
+new_tests = merge(tests, sumsum,  by = c('year', 'month'))
+
+```
+
+```{r}
+# names(new_train)
+# pr_func = preProcess(new_train[,c(6,9:14)], method=c("center", "scale")) #3,4,
+# new_train2 = predict(pr_func, new_train[,c(6,9:14)]) #3,4,
+# # predict(pr_func, new_train2, type = "response") 
+# 
+# 
+# new_train5 = cbind(new_train[,c(1,2,3,4,5,7,8)], new_train2)
+# new_train5
+```
+
+```{r}
+# revPredict <- function(preproc, data, digits=0) {
+#   data %>%
+#     select(one_of(preproc$mean %>% names)) %>%
+#     map2_df(preproc$std, ., function(sig, dat) dat * sig) %>%
+#     map2_df(preproc$mean, ., function(mu, dat) dat + mu)
+# }
+# 
+# revPredict(c("center", "scale"),new_train2)
+# 
+# unPreProc(preProc, data)
+new_train
 ```
 
