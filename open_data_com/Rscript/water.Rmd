@@ -1,0 +1,143 @@
+---
+title: "water"
+author: "Siming Yan"
+date: "5/2/2021"
+output: html_document
+---
+
+```{r}
+library(caret)
+library(tidyverse)
+library(xgboost)
+library("Matrix")
+data = read.csv("../data/full_train.csv")
+data[1,]
+data[1036,]
+```
+
+```{r}
+target = data$A厂
+data %>% dim
+data=data[,2:8]
+data$B厂 = data$B厂 %>% as.factor()
+levels(data$B厂) = c(0,1)
+data$B厂 = data$B厂 %>% as.numeric()
+data$B2 = 1-data$B厂
+
+str(data)
+data$B2 = as.numeric(data$B2)
+data = data[, !names(data) %in% "B厂"]
+data$B2 = data$B2 +1
+# target[1036]
+```
+
+```{r}
+library(doParallel)
+cl <- makePSOCKcluster(8)
+registerDoParallel(cl)
+```
+
+
+```{r}
+trControl = trainControl(
+    method = 'cv',
+    number = 5,
+    # summaryFunction = giniSummary,
+    # classProbs = TRUE,
+    verboseIter = TRUE,
+    allowParallel = TRUE)
+```
+ 
+```{r}
+tuneGridXGB = expand.grid(
+    nrounds = c(500),
+    max_depth = c(7, 11, 17),
+    eta = c(.1, 0.05, 0.01),
+    gamma = c(0),
+    colsample_bytree = c(1),
+    subsample = c(0.850, 1), 
+    min_child_weight = 1)
+
+xgbmod_2 <- train(
+    x = data,
+    y = target,
+    method = 'xgbTree',
+    metric = "RMSE",
+    # metric = 'NormalizedGini',
+    trControl = trControl,
+    tuneGrid = tuneGridXGB,
+    verbose = F)
+
+
+xgbmod_2$results[order(xgbmod_2$results$RMSE),]
+```
+
+```{r}
+xgb_model_final <- caret::train(
+  x = data, # tr_x is data frame, xgbTree needs matrix
+  y = target,
+  trControl = trControl,
+  tuneGrid = xgbmod_2$bestTune,
+  method = "xgbTree",
+  verbose = TRUE
+)
+```
+
+```{r}
+head(data)
+```
+
+```{r}
+tests = read.csv("../data/tests_modified_yan.csv")
+sub0 = read.csv("../data/baseline_sub.csv")
+head(tests)
+
+tests = rbind(tests,tests)
+tests %>% dim
+tests$B2 = 0
+tests$A厂[152:302] = tests$B厂[152:302]
+tests$B厂[1:151] = 1
+tests$B厂[152:302] = 0
+tests$B2[152:302] = 1
+
+tests = tests[,2:9]
+tests = tests[,names(data)]
+
+
+jew = tests$month
+tests$month = tests$year
+tests$year = jew
+
+tests = tests[, !names(tests) %in% "B厂"]
+
+```
+
+```{r}
+sub_xgb = predict(xgb_model_final, newdata = tests)
+sub_xgb
+sub0$B厂 = sub_xgb[1:151]
+sub0$A厂 = sub_xgb[152:302]
+sub_xgb %>% length()
+write.csv(sub0, "../data/xgb.csv", row.names = F)
+```
+
+#--------------------------------------------
+
+```{r}
+train = read.csv("../data/train_modified_yan.csv")
+tests = read.csv("../data/tests_modified_yan.csv")
+sub0  = read.csv("../data/baseline_sub.csv")
+sub_xg= read.csv("../data/xgb.csv")
+```
+
+```{r}
+Asum = train %>% group_by(year, month) %>% summarise(mean(A厂), median(A厂), var(A厂)^.5)
+names(Asum)[3:5] = c("mean_a", "med_a", "sqrt_a")
+Bsum = train %>% group_by(year, month) %>% summarise(mean(B厂), median(B厂), var(B厂)^.5)
+names(Bsum)[3:5] = c("mean_b", "med_b", "sqrt_b")
+```
+```{r}
+sumsum = merge(Asum, Bsum, by = c('year', 'month'))
+merge(train, sumsum,  by = c('year', 'month'))
+```
+
