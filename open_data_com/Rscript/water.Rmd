@@ -150,14 +150,14 @@ new_tests = merge(tests, sumsum,  by = c('year', 'month'))
 ```
 
 ```{r}
-# names(new_train)
-# pr_func = preProcess(new_train[,c(6,9:14)], method=c("center", "scale")) #3,4,
-# new_train2 = predict(pr_func, new_train[,c(6,9:14)]) #3,4,
-# # predict(pr_func, new_train2, type = "response") 
-# 
-# 
-# new_train5 = cbind(new_train[,c(1,2,3,4,5,7,8)], new_train2)
-# new_train5
+names(new_train)
+pr_func = preProcess(new_train[,c(6,9:14)], method=c("center", "scale")) #3,4,
+new_train2 = predict(pr_func, new_train[,c(6,9:14)]) #3,4,
+new_train5 = cbind(new_train[,c(1,2,3,4,5,7,8)], new_train2)
+# --------------------------------------------
+pr_func = preProcess(new_tests[,c(6,9:14)], method=c("center", "scale")) #3,4,
+new_tests2 = predict(pr_func, new_tests[,c(6,9:14)]) #3,4,
+new_tests5 = cbind(new_tests[,c(1,2,3,4,5,7,8)], new_tests2)
 ```
 
 ```{r}
@@ -171,6 +171,8 @@ new_tests = merge(tests, sumsum,  by = c('year', 'month'))
 # revPredict(c("center", "scale"),new_train2)
 # 
 # unPreProc(preProc, data)
-new_train
+write.csv(new_train, "../data/R_train_modified_yan.csv", row.names = F)
+write.csv(new_tests, "../data/R_tests_modified_yan.csv", row.names = F)
+
 ```
 
