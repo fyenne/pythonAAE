@@ -206,6 +206,10 @@ Page 3
 # library(RColorBrewer)
 # RColorBrewer::brewer.pal.info
 # RColorBrewer::display.brewer.pal(name = 'YlOrRd')
+
+full_scale %>% names()
+full_scale %>% group_by()
+
 ```
 
  
