@@ -202,13 +202,27 @@ Page 3
 
 <!-- ### Chart F  -->
 
+
+```{r}
+install.packages("wordcloud")
+library(wordcloud)
+install.packages("RColorBrewer")
+library(RColorBrewer)
+install.packages("wordcloud2")
+library(wordcloud2)
+```
+
 ```{r, echo = F, warning=F, message=F}
 # library(RColorBrewer)
 # RColorBrewer::brewer.pal.info
 # RColorBrewer::display.brewer.pal(name = 'YlOrRd')
 
 full_scale %>% names()
-full_scale %>% group_by()
+plt_3_data = data.frame(full_scale %>% group_by(yearmon) %>% count(full_scale$column_names))
+plt_3_data[plt_3_data['n'] > 1 , ]
+
+
+wordcloud(words = df$word, freq = df$freq, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
 
 ```
 
