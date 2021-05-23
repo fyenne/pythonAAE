@@ -35,7 +35,7 @@ library(DT) # Displaying data tables
 
 ```{r include=FALSE}
 # Read in data. 
-data <- read.csv('./suicide-data.csv') 
+data <- read.csv('./master.csv') 
 names(data)[1] = 'country'
 data <- data %>%
   filter(year != 2016, # filter out 2016 and countries with 0 data. 
@@ -190,12 +190,13 @@ Column {data-width=300}
 -----------------------------------------------------------------------
 
 ### Suicides per 100K <font size='1'> (1985-2015) </font>
+
 ```{r fig.height=0.8}
 # Grab worldwide number of suicides per 100K people from the data
 total_suicides <- round(mean(overall_tibble$suicide_capita), 2)
 
-# Create value box
-valueBox(total_suicides, icon = "fa-plus", color = 'firebrick')
+# Create value boxaa
+valueBox(total_suicides, icon = "fa-plus", subtitle = '')
 ```
 
 ### Worldwide suicides by Gender {.no-title .no-padding .colored }

@@ -58,7 +58,7 @@ Overview of data from scale sys.BDP
 <!-- ``` -->
 
 
-Column {data-width=500}
+Column {data-width=500 .no-padding}
 -------------------------------------
 
 ### Renew by date(last renew time)
@@ -200,15 +200,17 @@ Page 3
 <!-- ----------------------------------------------------------------------- -->
 
 
-<!-- ### Chart F  -->
+### Chart F
 
+Column {data-height = 1500}
+-----------------------------------------------------------------------
 
-```{r}
-install.packages("wordcloud")
+```{r, echo = F}
+# install.packages("wordcloud")
 library(wordcloud)
-install.packages("RColorBrewer")
+# install.packages("RColorBrewer")
 library(RColorBrewer)
-install.packages("wordcloud2")
+# install.packages("wordcloud2")
 library(wordcloud2)
 ```
 
@@ -217,14 +219,25 @@ library(wordcloud2)
 # RColorBrewer::brewer.pal.info
 # RColorBrewer::display.brewer.pal(name = 'YlOrRd')
 
-full_scale %>% names()
+# full_scale %>% names()
 plt_3_data = data.frame(full_scale %>% group_by(yearmon) %>% count(full_scale$column_names))
-plt_3_data[plt_3_data['n'] > 1 , ]
+plt_3_data = plt_3_data[plt_3_data['n'] > 1 , ]
 
 
-wordcloud(words = df$word, freq = df$freq, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+wordcloud(words = plt_3_data$full_scale.column_names, 
+          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+
+
+plt_3_data %>% subset(plt_3_data$yearmon == '2020-06-09')
 
 ```
 
  
+```{r}
+plot_ly(plt2_data,labels = ~., 
+                values = ~Freq, 
+                type = 'pie',
+                domain = list(row = 0, column = 0),
+                title = 'table_data_type')
+```
 
