@@ -1,0 +1,243 @@
+---
+title: "scale_dashboard"
+author: "Siming Yan"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  flexdashboard::flex_dashboard:
+    # orientation: columns
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+require(reshape2)
+require(PerformanceAnalytics)
+# library(p8105.datasets)
+# require(rCharts)
+library(shiny)
+library(shinydashboard)
+library(shinydashboardPlus)
+library(bs4Dash)
+
+library(lubridate)
+```
+
+
+
+```{r, include=F}
+full_scale = read.csv("./full_scale_table_modify.csv", encoding = 'UTF-8')
+
+full_scale$yearmon = ymd(paste0(full_scale$year,"0",full_scale$month,full_scale$date))
+```
+ 
+```{r, include=F}
+plt1_data = data.frame(full_scale %>% group_by(yearmon) %>% count())
+
+plt1_data$percent = (plt1_data$n/sum(plt1_data$n)) %>% round(2)
+plt1_data$yearmon = as.character(plt1_data$yearmon)
+# plt1_data$percent %>% round(2)
+```
+
+Overview of data from scale sys.BDP
+=====================================     
+
+<!-- Inputs {.sidebar} -->
+<!-- ------------------------------------- -->
+
+<!-- ```{r, echo = F } -->
+
+<!-- selectInput("asd", label = "year_mon :", -->
+<!--             choices = full_scale$yearmon, -->
+<!--             selected = c(full_scale$yearmon %>% as.list()), -->
+<!--             multiple = T) -->
+
+<!-- ``` -->
+
+
+Column {data-width=500 .no-padding}
+-------------------------------------
+
+### Renew by date(last renew time)
+
+```{r, echo = F}
+plt1_plt = ggplot(plt1_data)+
+  aes(x = yearmon, weight = n, fill = yearmon)+
+  geom_bar() + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  geom_text(aes(label = percent, y = n), 
+            data = plt1_data, 
+            size = 2.5,
+            angle = 45)
+
+ggplotly(plt1_plt)
+```
+
+
+```{r, echo = F }
+# data.frame(full_scale$yearmon)
+# ggplot(data.frame(full_scale$yearmon)) + aes(x = full_scale.yearmon) + geom_bar() + geom_text(aes(label = ..count..), stat = 'count',data = data.frame(full_scale$yearmon))
+
+```
+
+<!-- ### Chart B -->
+
+```{r, echo = F}
+# library(XML)
+# library(leafletCN)
+# # 读取网页的表格
+# # Sorry for 爬了你家网站
+# table = readHTMLTable("http://www.pm25.in/rank",
+#                       encoding = "UTF-8", stringsAsFactors = F)[[1]]
+# 
+# # 整理数据并命名
+# 
+# dat = table[ , 2:3]
+# names(dat) = c("city","AQI")
+# dat$AQI = as.numeric(dat$AQI)
+# 
+# # 调用geojsonMap进行绘制
+# geojsonMap(dat, "city",
+#            popup =  paste0(dat$city, ":", dat$AQI),
+#            palette = "Reds", legendTitle = "AQI")
+ 
+# renderPlotly({
+#   managers.melt[managers.melt$manager == input$asd, ] %>% 
+#     # filter(manager == input$asd) %>%
+#     plot_ly(x = ~ date,y = ~val, 
+#             group_by = ~manager, 
+#             color = ~manager
+#             ) %>% 
+#     add_lines() %>% 
+#     layout(showlegend = F)
+#            
+# })
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Chart C 
+
+<!--  {.tabset .tabset-fade} -->
+
+```{r, echo = F}
+plt2_data = data.frame(full_scale$table_type %>% table)
+plt2_d2 = data.frame(full_scale$Granularity %>% table)
+plt2_d3 = data.frame(full_scale$module %>% table)
+plt2_d4 = data.frame(full_scale$conn_type %>% table)
+# plt2_data
+plt2 <- plot_ly(plt2_data, 
+                labels = ~., 
+                values = ~Freq, 
+                type = 'pie',
+                domain = list(row = 0, column = 0),
+                title = 'table_data_type')
+
+plt2 <- plt2 %>% add_pie(data = plt2_d2,
+                         labels = ~.,
+                         values = ~Freq,
+                         domain = list(row = 0, column = 1),
+                         title = 'Granularity')
+
+plt2 <- plt2 %>% add_pie(data = plt2_d3,
+                         labels = ~.,
+                         values = ~Freq,
+                         domain = list(row = 1, column = 0),
+                         title = 'module_type')
+
+plt2 <- plt2 %>% add_pie(data = plt2_d4,
+                         labels = ~.,
+                         values = ~Freq,
+                         domain = list(row = 1, column = 1),
+                         title = 'conn_type')
+
+
+plt2 <- plt2 %>% layout(title = 'pies',
+                        grid=list(rows=2, columns=2),
+                        showlegend = F,
+                        xaxis = list(showgrid = FALSE, 
+                                     zeroline = FALSE, 
+                                     showticklabels = FALSE),
+                        yaxis = list(showgrid = FALSE, 
+                                     zeroline = FALSE, 
+                                     showticklabels = FALSE))
+
+plt2
+
+
+```
+
+```{r, echo = F}
+# require(rCharts)
+```
+
+Page 2 
+===================================== 
+
+Column {data-width = 1500}
+-----------------------------------------------------------------------
+
+### Chart E
+
+```{r, echo = F}
+# renderTable({full_scale})
+
+library(DT)
+DT::datatable(full_scale[, 2:23],
+  rownames = FALSE, options = list(pageLength = 100)
+)
+```
+
+
+Page 3 
+=====================================     
+
+<!-- Column {data-height=800} -->
+<!-- ----------------------------------------------------------------------- -->
+
+
+### Chart F
+
+Column {data-height = 1500}
+-----------------------------------------------------------------------
+
+```{r, echo = F}
+# install.packages("wordcloud")
+library(wordcloud)
+# install.packages("RColorBrewer")
+library(RColorBrewer)
+# install.packages("wordcloud2")
+library(wordcloud2)
+```
+
+```{r, echo = F, warning=F, message=F}
+# library(RColorBrewer)
+# RColorBrewer::brewer.pal.info
+# RColorBrewer::display.brewer.pal(name = 'YlOrRd')
+
+# full_scale %>% names()
+plt_3_data = data.frame(full_scale %>% group_by(yearmon) %>% count(full_scale$column_names))
+plt_3_data = plt_3_data[plt_3_data['n'] > 1 , ]
+
+
+wordcloud(words = plt_3_data$full_scale.column_names, 
+          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+
+
+plt_3_data %>% subset(plt_3_data$yearmon == '2020-06-09')
+
+```
+
+ 
+```{r}
+plot_ly(plt2_data,labels = ~., 
+                values = ~Freq, 
+                type = 'pie',
+                domain = list(row = 0, column = 0),
+                title = 'table_data_type')
+```
+
