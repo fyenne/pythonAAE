@@ -6,6 +6,7 @@ output:
   flexdashboard::flex_dashboard:
     # orientation: columns
     vertical_layout: fill
+    theme: yeti
 runtime: shiny
 ---
 
@@ -26,6 +27,18 @@ library(bs4Dash)
 library(lubridate)
 ```
 
+
+
+``` {js, include =F}
+// Inverse color of navigation bar.
+$('.navbar-inverse').removeClass('navbar-inverse').addClass('navbar-default');
+```
+
+<style>
+.colored {
+  background-color: #FAFAFA;
+}
+</style>
 
 
 ```{r, include=F}
@@ -175,36 +188,16 @@ plt2
 # require(rCharts)
 ```
 
-Page 2 
-===================================== 
 
-Column {data-width = 1500}
------------------------------------------------------------------------
-
-### Chart E
-
-```{r, echo = F}
-# renderTable({full_scale})
-
-library(DT)
-DT::datatable(full_scale[, 2:23],
-  rownames = FALSE, options = list(pageLength = 100)
-)
-```
-
-
-Page 3 
+summary by time (page 2)
 =====================================     
 
 <!-- Column {data-height=800} -->
 <!-- ----------------------------------------------------------------------- -->
 
 
-### Chart F
-
-Column {data-height = 1500}
+Column {.tabset .tabset-fade data-width = 500 .colored }
 -----------------------------------------------------------------------
-
 ```{r, echo = F}
 # install.packages("wordcloud")
 library(wordcloud)
@@ -215,29 +208,101 @@ library(wordcloud2)
 ```
 
 ```{r, echo = F, warning=F, message=F}
-# library(RColorBrewer)
-# RColorBrewer::brewer.pal.info
-# RColorBrewer::display.brewer.pal(name = 'YlOrRd')
 
 # full_scale %>% names()
 plt_3_data = data.frame(full_scale %>% group_by(yearmon) %>% count(full_scale$column_names))
-plt_3_data = plt_3_data[plt_3_data['n'] > 1 , ]
+plt_3_data_lacked = plt_3_data[plt_3_data['n'] > 1 , ]
+# plt_3_data_lacked$yearmon %>% unique()
 
-
-wordcloud(words = plt_3_data$full_scale.column_names, 
-          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
-
-
-plt_3_data %>% subset(plt_3_data$yearmon == '2020-06-09')
+# full_scale %>% subset(full_scale$yearmon == '2020-06-09')
 
 ```
 
- 
-```{r}
-plot_ly(plt2_data,labels = ~., 
-                values = ~Freq, 
-                type = 'pie',
-                domain = list(row = 0, column = 0),
-                title = 'table_data_type')
+
+### word cloud 2020-06-09 {.no-padding}
+
+```{r, echo = F, warning = F,message = F}
+
+wordcloud(words = (plt_3_data %>% subset(plt_3_data$yearmon == "2020-06-09"))$full_scale.column_names, 
+          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+```
+
+### word cloud 2020-07-20 {.no-padding}
+
+```{r, echo = F, message=F}
+
+wordcloud(words = (plt_3_data %>% subset(plt_3_data$yearmon == "2020-07-20"))$full_scale.column_names, 
+          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+
+
+```
+
+Column {.tabset .tabset-fade data-width = 500 .colored }
+-----------------------------------------------------------------------
+
+### word cloud 2021-05-18 {.no-padding}
+
+```{r, echo = F}
+wordcloud(words = (plt_3_data %>% subset(plt_3_data$yearmon == "2021-05-18"))$full_scale.column_names, 
+          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+
+
+```
+
+
+### word cloud 2021-05-19 {.no-padding}
+
+
+```{r, echo = F, warning = F, message = F}
+wordcloud(words = (plt_3_data %>% subset(plt_3_data$yearmon == "2021-05-19"))$full_scale.column_names, 
+          freq = plt_3_data$n, min.freq = 1,max.words=200, random.order=FALSE, rot.per=0.35,colors=brewer.pal(8, "Dark2"))
+```
+
+
+Detailed data
+=======================================================================
+
+
+Column {.tabset .tabset-fade data-width=2000 .colored }
+-----------------------------------------------------------------------
+
+### Table 1 "2020-07-20" {.no-padding}
+
+```{r, echo =F}
+library(DT)
+DT::datatable((full_scale %>% subset(yearmon == "2020-07-20"))[,2:15],
+  rownames = FALSE, options = list(pageLength = 100)
+)
+```
+
+### Table 2 "2021-05-18" {.no-padding}
+
+```{r, echo =F}
+
+DT::datatable((full_scale %>% subset(yearmon == "2021-05-18"))[,2:15],
+  rownames = FALSE, options = list(pageLength = 100)
+)
+
+```
+
+
+
+
+
+Data Full View 
+=====================================
+
+
+Column {data-width = 2000}
+-----------------------------------------------------------------------
+
+### Chart E
+
+```{r, echo = F}
+# renderTable({full_scale})
+
+DT::datatable(full_scale[, 2:23],
+  rownames = FALSE, options = list(pageLength = 100)
+)
 ```
 

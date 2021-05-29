@@ -13,12 +13,12 @@ Thank you for checking out my kernel!
 
 Please upvote if you like the dashboard and if you have any suggestions feel free to leave a comment!
 
-.
 
 ``` {js}
 // Inverse color of navigation bar.
 $('.navbar-inverse').removeClass('navbar-inverse').addClass('navbar-default');
 ```
+.
 
 ```{r setup, include=FALSE}
 # Load necessary packages. 
@@ -98,7 +98,7 @@ custom_theme <- hc_theme(
 Worldwide
 =======================================================================
 
- Column {.tabset .tabset-fade data-width=700 .colored }
+Column {.tabset .tabset-fade data-width=700 .colored }
 -----------------------------------------------------------------------
 
 ### Worldwide suicides {.no-padding}
@@ -196,7 +196,7 @@ Column {data-width=300}
 total_suicides <- round(mean(overall_tibble$suicide_capita), 2)
 
 # Create value boxaa
-valueBox(total_suicides, icon = "fa-plus", subtitle = '')
+valueBox(total_suicides, icon = "fa-plus")
 ```
 
 ### Worldwide suicides by Gender {.no-title .no-padding .colored }
