@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/fyenne/miniforge3/envs/siming/bin/python",
+    "python.pythonPath": "D:\\miniconda_dependent\\miniconda\\envs\\siming\\python.exe",
     "jupyter.jupyterServerType": "local",
     "jupyter.jupyterCommandLineArguments": []
 }
