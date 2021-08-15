@@ -8,6 +8,18 @@ According to: Kaggle, ISLR, Matt:Bussiness data science, AAE722 machine learning
 
 ---
 
+# bds
+
+##	  alg1: bootstrap
+
+![Screen Shot 2021-07-25 at 10.47.03 AM](/Users/fyenne/Downloads/booooks/semester5/pythonAAE/py_handbook/pic_for_md/Screen Shot 2021-07-25 at 10.47.03 AM.png)
+
+
+
+## alg2: 
+
+Algorithm 2 resembles closely our earlier bootstrap. The difference is that it targets the distribution for errors—how much larger or smaller the estimates are than the target—rather than the distribution for the estimates themselves.
+
 # Kaggle: **Decision tree**
 
 * both regression and classification
